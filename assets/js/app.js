@@ -208,13 +208,14 @@
         <button class="icon-btn only-m" id="menu-btn" aria-label="Abrir menú" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
         </button>
-        <a href="index.html" class="logo" aria-label="Inicio">MARCA<span>®</span></a>
         <nav class="nav" id="nav" aria-label="Principal">
           ${NAV.map((n, k) => `<div class="nav-item">
             <a href="${n.href}" class="nav-top ${n.cls || ''}" aria-haspopup="true" aria-expanded="false" aria-controls="mega-${k}">${n.label}</a>
             <div class="mega" id="mega-${k}"><div class="wrap mega-in">${n.menu()}</div></div>
           </div>`).join('')}
         </nav>
+        <a href="index.html" class="logo" aria-label="Inicio">MARCA<span>®</span></a>
+        <div class="bar-actions">
         <form class="search" role="search" action="catalogo.html">
           <label for="q" class="sr">Buscar</label>
           <input id="q" name="q" type="search" placeholder="Buscar prenda, color o SKU" autocomplete="off" />
@@ -224,7 +225,13 @@
           <svg viewBox="0 0 24 24" width="22" height="22"><path d="M5 8h14l-1 12H6L5 8Zm4 0V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
           <span class="count" id="cart-count">0</span>
         </button>
+        </div>
       </div>`;
+
+    // En la Home el encabezado va transparente sobre la foto y se vuelve blanco al bajar.
+    const solid = () => el.classList.toggle('solid', !document.body.classList.contains('home') || scrollY > 40);
+    solid();
+    addEventListener('scroll', solid, { passive: true });
 
     // Anuncio rotativo
     let i = 0;
@@ -502,6 +509,14 @@
       const n = P.filter(p => matchesQuery(p, new URLSearchParams(c.href.split('?')[1]))).length;
       return `<a class="cat" href="${c.href}"><div class="cat-img">${garmentSVG(c.garment, c.color, c.name)}</div><span>${c.name}</span><small class="muted">${n} referencias</small></a>`;
     }).join('');
+    const float = $('#hero-float');
+    if (float) {
+      const pieces = [['jersey', 'junior-l', 'Camiseta de fútbol'], ['legging', 'lima', 'Legging'], ['hoodie', 'blanco', 'Suéter con capota'], ['skirt', 'malva', 'Falda deportiva'], ['tee', 'negro', 'Camiseta dry-fit']];
+      float.innerHTML = pieces.map(([g, c, l], i) => `<div class="fl fl-${i + 1}">${garmentSVG(g, c, l)}</div>`).join('');
+    }
+    $$('.collection-art[data-g]').forEach(el => { el.innerHTML = garmentSVG(el.dataset.g, el.dataset.c, el.closest('.collection').querySelector('h2').textContent); });
+    const newIn = $('#new-in');
+    if (newIn) { newIn.innerHTML = P.filter(p => p.tags.includes('nuevo')).slice(0, 8).map(card).join(''); bindCards(newIn); }
     const best = $('#best');
     const renderBest = () => { if (best) { best.innerHTML = P.filter(p => p.tags.includes('bestseller')).slice(0, 8).map(card).join(''); bindCards(best); } };
     renderBest();

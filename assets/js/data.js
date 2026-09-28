@@ -125,7 +125,7 @@ window.PRODUCTS = [
   jersey('cali', 'hombre', 89900),
   jersey('medellin', 'hombre', 89900),
   jersey('junior', 'mujer', 84900, ['nuevo']),
-  jersey('america', 'mujer', 84900),
+  jersey('america', 'mujer', 84900, ['nuevo']),
   jersey('nacional', 'mujer', 84900),
   jersey('millonarios', 'mujer', 84900),
 

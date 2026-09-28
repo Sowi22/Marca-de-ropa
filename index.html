@@ -3,53 +3,92 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MARCA · Ropa deportiva y casual al por mayor y al detal</title>
+  <title>MARCA · Ropa deportiva, fútbol y casual al por mayor y al detal</title>
   <meta name="description" content="Ropa deportiva, conjuntos de gimnasio, camisetas de fútbol de equipos colombianos y ropa casual para hombre y mujer. Precio por mayor desde 12 piezas mezclando referencias, tallas y colores. Envío a toda Colombia." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=IBM+Plex+Mono:wght@500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..900&family=IBM+Plex+Mono:wght@500&display=swap" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
-<body>
+<body class="home">
   <header id="site-header"></header>
 
   <main>
-    <!-- Above the fold: qué vendemos + para quién + diferenciador + acción -->
-    <section class="wrap hero">
-      <div>
-        <p class="eyebrow">Fabricantes · Venta al por mayor y al detal · Envío a toda Colombia</p>
-        <h1 class="h1" style="margin-top:12px">Ropa deportiva y casual para surtir tu tienda</h1>
-        <p class="lead">Conjuntos de gimnasio, leggings, faldas deportivas, camisetas de fútbol de equipos colombianos, suéteres y camisetas para hombre y mujer. Cada prenda muestra su precio al detal y su precio por mayor. Desde <b>12 piezas</b> en tu pedido, mezclando referencias, tallas y colores, todo pasa a precio por mayor.</p>
+    <!-- Hero a todo el ancho: titular gigante con las prendas flotando encima -->
+    <section class="hero-full" aria-label="Portada">
+      <p class="hero-word" aria-hidden="true"><span>HECHO PARA</span><span>MOVERSE</span></p>
+      <div class="hero-float" id="hero-float"></div>
+      <div class="hero-copy wrap">
+        <h1>Ropa deportiva, camisetas de fútbol y casual</h1>
+        <p>Al detal o por mayor desde <b>12 piezas</b>, mezclando referencias, tallas y colores.</p>
         <div class="hero-cta">
-          <a class="btn btn-b2b" href="catalogo.html">Ver precios por mayor</a>
-          <a class="btn ghost" href="catalogo.html">Comprar al detal</a>
+          <a class="btn light" href="catalogo.html?tag=nuevo">Ver novedades</a>
+          <a class="btn outline-light" href="mayoristas.html">Comprar por mayor</a>
         </div>
       </div>
-      <figure class="hero-art" style="margin:0">
-        <span class="stamp">Colores temporada oct–dic</span>
-        <div id="hero-garments" style="display:grid;place-items:center;width:100%;height:100%"></div>
-        <figcaption id="hero-color"></figcaption>
-      </figure>
     </section>
 
-    <div class="wrap">
-      <div class="facts">
-        <div class="fact"><b>12 piezas</b><span>Mínimo para precio por mayor, mezclando referencias</span></div>
-        <div class="fact"><b>Hasta −45%</b><span>Precio por volumen sobre el detal sugerido</span></div>
-        <div class="fact"><b>24–48 h</b><span>Despacho a toda Colombia con guía de seguimiento</span></div>
-        <div class="fact"><b>PSE · Nequi</b><span>También Bancolombia y tarjeta de crédito</span></div>
+    <div class="facts-band">
+      <div class="wrap facts">
+        <div class="fact"><b>12 piezas</b><span>para precio por mayor</span></div>
+        <div class="fact"><b>Hasta −45%</b><span>sobre el precio detal</span></div>
+        <div class="fact"><b>24–48 h</b><span>despacho a toda Colombia</span></div>
+        <div class="fact"><b>PSE · Nequi</b><span>Bancolombia y tarjeta</span></div>
       </div>
     </div>
 
     <section class="wrap section">
-      <div class="section-h"><h2>Compra por categoría</h2><a href="catalogo.html" class="small">Ver todo el catálogo</a></div>
-      <div class="cats" id="cats"></div>
+      <div class="section-h"><h2>Novedades</h2><a href="catalogo.html?tag=nuevo" class="see-all">Ver todo</a></div>
+      <div class="grid" id="new-in"></div>
+    </section>
+
+    <!-- Banners de colección a todo el ancho -->
+    <section class="collection c-mujer">
+      <div class="collection-art" data-g="set" data-c="malva"></div>
+      <div class="collection-copy">
+        <h2>Mujer</h2>
+        <ul>
+          <li>Conjuntos de gimnasio, leggings y faldas deportivas</li>
+          <li>Tallas 6, 8, 10 y 12</li>
+          <li>Precio por mayor desde 12 piezas</li>
+        </ul>
+        <a class="btn outline-light" href="catalogo.html?genero=mujer">Ver colección</a>
+      </div>
+    </section>
+    <section class="collection c-hombre reverse">
+      <div class="collection-art" data-g="tee" data-c="oliva"></div>
+      <div class="collection-copy">
+        <h2>Hombre</h2>
+        <ul>
+          <li>Camisetas dry-fit, pantalonetas y joggers</li>
+          <li>Polos, camisetas oversize y bermudas</li>
+          <li>Tallas S a XXL</li>
+        </ul>
+        <a class="btn outline-light" href="catalogo.html?genero=hombre">Ver colección</a>
+      </div>
+    </section>
+    <section class="collection c-futbol">
+      <div class="collection-art" data-g="jersey" data-c="junior-l"></div>
+      <div class="collection-copy">
+        <h2>Fútbol</h2>
+        <ul>
+          <li>Camisetas de 7 equipos colombianos</li>
+          <li>Local y visitante, hombre y mujer</li>
+          <li>Surte tu tienda para cada fecha del torneo</li>
+        </ul>
+        <a class="btn outline-light" href="catalogo.html?linea=futbol">Ver camisetas</a>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="section-h"><h2>Más vendidos</h2><a href="catalogo.html?tag=bestseller" class="see-all">Ver todo</a></div>
+      <div class="grid" id="best"></div>
     </section>
 
     <section class="wrap section" id="niveles">
       <div class="section-h">
-        <div><h2>Cuánto ahorras por volumen</h2><p class="muted">Mueve la barra con las piezas de tu pedido. Calculado con un precio detal promedio de $79.900 por pieza.</p></div>
-        <a href="mayoristas.html" class="small">Condiciones mayoristas completas</a>
+        <div><h2>Compra por mayor</h2><p class="muted">Mueve la barra con las piezas de tu pedido. Calculado con un precio detal promedio de $79.900 por pieza.</p></div>
+        <a href="mayoristas.html" class="see-all">Condiciones</a>
       </div>
       <div class="calc">
         <div class="calc-in">
@@ -69,38 +108,15 @@
             <div><dt>Pagas</dt><dd id="calc-pay">—</dd></div>
             <div><dt>Margen bruto estimado</dt><dd id="calc-margin" class="hl">—</dd></div>
           </dl>
-          <a class="btn btn-b2b" href="catalogo.html?vista=lista">Armar mi pedido</a>
+          <a class="btn light" href="catalogo.html?vista=lista">Armar mi pedido</a>
         </div>
       </div>
-    </section>
-
-    <section class="wrap section">
-      <div class="section-h"><div><h2>Más vendidos</h2><p class="muted">Las referencias con más recompra de nuestras boutiques. [VALIDAR con datos de venta reales]</p></div><a href="catalogo.html?tag=bestseller" class="small">Ver todos</a></div>
-      <div class="grid" id="best"></div>
-    </section>
-
-    <section class="wrap section">
-      <div class="section-h"><h2>Así haces tu pedido mayorista</h2></div>
-      <ol class="steps">
-        <li><h3>Elige</h3><p>En cada prenda ves el precio al detal y el precio por mayor, sin registrarte.</p></li>
+      <ol class="steps" style="margin-top:40px">
+        <li><h3>Elige</h3><p>Cada prenda muestra el precio al detal y el precio por mayor, sin registrarte.</p></li>
         <li><h3>Arma cantidades</h3><p>Llena la tabla de tallas y colores. Mezcla referencias hasta llegar a 12 piezas.</p></li>
         <li><h3>Paga</h3><p>PSE, Nequi, Bancolombia o tarjeta. O envía el pedido a un asesor por WhatsApp.</p></li>
         <li><h3>Recibe y repite</h3><p>Despacho en 24–48 h con guía. Tu pedido queda guardado para repetirlo.</p></li>
       </ol>
-    </section>
-
-    <section class="wrap section">
-      <div class="section-h"><div><h2>Colores para vender de octubre a diciembre</h2><p class="muted">Selección cruzando tendencias Pantone 2026–2027 con el calendario comercial colombiano.</p></div></div>
-      <div class="seasons" id="season"></div>
-    </section>
-
-    <section class="wrap section">
-      <div class="section-h"><h2>Por qué comprarnos</h2></div>
-      <div class="trust">
-        <div><h3>Fabricación propia</h3><p>[DATO REQUERIDO] Años de operación, ciudad del taller y fotos reales de producción.</p></div>
-        <div><h3>Boutiques que ya nos compran</h3><p>[DATO REQUERIDO] 3 testimonios reales con nombre de la tienda, ciudad e Instagram. No usar testimonios inventados.</p></div>
-        <div><h3>Empresa verificable</h3><p>[DATO REQUERIDO] Razón social, NIT, dirección de bodega y reseñas de Google.</p></div>
-      </div>
     </section>
 
     <section class="wrap section">
