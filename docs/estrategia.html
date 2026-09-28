@@ -1,0 +1,629 @@
+<title>Plan tienda mayorista MARCA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F1EC; --surface:#FBFAF7; --ink:#17191C; --ink2:#44474C; --muted:#6B6D70; --line:#D8D5CD;
+  --b2b:#00539C; --b2b-soft:#DDE7F2; --ok:#2E7A4E; --warn:#8A5200; --bad:#A3252F;
+  --f:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#141518; --surface:#1C1E22; --ink:#ECEBE6; --ink2:#C3C3BE; --muted:#9A9B98; --line:#34363B;
+  --b2b:#7FB2E5; --b2b-soft:#1B2D42; --ok:#6CC08F; --warn:#E0A650; --bad:#EE7C84;}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#141518; --surface:#1C1E22; --ink:#ECEBE6; --ink2:#C3C3BE; --muted:#9A9B98; --line:#34363B;
+  --b2b:#7FB2E5; --b2b-soft:#1B2D42; --ok:#6CC08F; --warn:#E0A650; --bad:#EE7C84;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--f);margin:0}
+.page{max-width:1240px;margin-inline:auto;padding-inline:16px;padding-block:32px 80px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+@media (max-width:960px){.page{grid-template-columns:minmax(0,1fr);gap:24px}}
+nav.toc{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:.82rem}
+nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+nav.toc li{counter-increment:t}
+nav.toc a{display:flex;gap:8px;padding:3px 0;color:var(--ink2);text-decoration:none}
+nav.toc a::before{content:counter(t,decimal-leading-zero);font-family:var(--mono);color:var(--muted);font-size:.72rem;padding-top:2px}
+nav.toc a:hover{color:var(--ink)}
+nav.toc .grp{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+@media (max-width:960px){nav.toc{position:static;max-height:none;border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--surface)}nav.toc ol{columns:2;column-gap:20px}}
+@media (max-width:520px){nav.toc ol{columns:1}}
+main{min-width:0}
+h1,h2,h3{font-family:var(--f);line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:850;font-variation-settings:'wdth' 70;text-transform:uppercase;letter-spacing:-.01em}
+h2{font-size:1.55rem;font-weight:800;font-variation-settings:'wdth' 76;text-transform:uppercase;display:flex;gap:12px;align-items:baseline}
+h2 .n{font-family:var(--mono);font-size:.78rem;font-weight:500;color:var(--muted)}
+h3{font-size:1.05rem;font-weight:700;margin-top:18px}
+section{padding-top:44px;margin-top:44px;border-top:1px solid var(--line);display:grid;gap:14px}
+section:first-of-type{border-top:0;margin-top:0}
+p{margin:0;max-width:72ch}
+ul,ol{margin:0;padding-left:1.2em;max-width:76ch}
+li{margin:3px 0}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.1rem;color:var(--ink2)}
+.meta{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg);white-space:nowrap}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+tbody th{font-weight:700}
+.tag{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;padding:1px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap;margin:1px 0}
+.t-dato{color:var(--ok)} .t-inf{color:var(--b2b)} .t-sup{color:var(--warn)} .t-req{color:var(--bad)} .t-hip{color:var(--ink2)}
+.p0{color:var(--bad)} .p1{color:var(--warn)} .p2{color:var(--b2b)} .p3{color:var(--muted)}
+.call{border-left:3px solid var(--b2b);background:var(--b2b-soft);padding:12px 16px;border-radius:0 6px 6px 0;max-width:80ch}
+.call b{display:block;margin-bottom:2px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.box{border:1px solid var(--line);border-radius:6px;padding:14px 16px;background:var(--surface);display:grid;gap:6px;align-content:start}
+.box h3{margin:0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid rgba(128,128,128,.4);vertical-align:-2px;margin-right:6px}
+.chipset{display:flex;flex-wrap:wrap;gap:6px}
+.month{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;border:1px solid var(--line);border-radius:6px;padding:16px;background:var(--surface)}
+.month h3{margin:0;font-size:1.3rem;font-variation-settings:'wdth' 72;text-transform:uppercase}
+.bar{display:flex;height:44px;border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{flex:1}
+@media (max-width:600px){.month{grid-template-columns:minmax(0,1fr)}}
+pre{font-family:var(--mono);font-size:.8rem;line-height:1.5;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;overflow-x:auto;margin:0}
+code{font-family:var(--mono);font-size:.84em}
+a{color:var(--b2b)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.82rem}
+</style>
+
+<div class="page">
+<nav class="toc" aria-label="Contenido">
+  <p class="grp">Diagnóstico</p>
+  <ol>
+    <li><a href="#s1">Resumen ejecutivo</a></li>
+    <li><a href="#s2">Análisis de mercado</a></li>
+    <li><a href="#s3">Competencia</a></li>
+    <li><a href="#s4">Cliente mayorista</a></li>
+    <li><a href="#s5">Buyer journey</a></li>
+    <li><a href="#s6">Estrategia comercial</a></li>
+    <li><a href="#s7">Diferenciación</a></li>
+    <li><a href="#s8">Sitemap</a></li>
+    <li><a href="#s9">Home</a></li>
+    <li><a href="#s10">Catálogo</a></li>
+    <li><a href="#s11">Ficha de producto</a></li>
+    <li><a href="#s12">Experiencia mayorista</a></li>
+    <li><a href="#s13">Experiencia detal</a></li>
+    <li><a href="#s14">Estrategia de color</a></li>
+    <li><a href="#s15">Paleta Pantone</a></li>
+    <li><a href="#s16">UI</a></li>
+    <li><a href="#s17">Animaciones</a></li>
+    <li><a href="#s18">Mobile</a></li>
+    <li><a href="#s19">Performance</a></li>
+    <li><a href="#s20">Copy</a></li>
+    <li><a href="#s21">CRO</a></li>
+    <li><a href="#s22">A/B testing</a></li>
+    <li><a href="#s23">Métricas</a></li>
+    <li><a href="#s24">Roadmap</a></li>
+    <li><a href="#s25">Checklist final</a></li>
+    <li><a href="#s26">Color: ahora → diciembre</a></li>
+    <li><a href="#fuentes">Fuentes</a></li>
+  </ol>
+</nav>
+
+<main>
+<header style="display:grid;gap:14px">
+  <p class="eyebrow">Estrategia de e-commerce · Colombia · 28 de septiembre de 2026</p>
+  <h1>Tienda online mayorista y detal de ropa deportiva y casual</h1>
+  <p class="lead">Estrategia para una tienda online de ropa deportiva y casual para hombre y mujer, con envíos a toda Colombia y construida a medida. La prioridad es el cliente mayorista, sin dejar de lado al comprador al detal. Incluye un prototipo navegable.</p>
+  <div class="legend"><span class="tag t-dato">DATO</span> verificado con fuente <span class="tag t-inf">INFERENCIA</span> interpretación propia <span class="tag t-sup">SUPUESTO</span> asumido para avanzar <span class="tag t-req">DATO REQUERIDO</span> lo debe dar el negocio <span class="tag t-hip">HIPÓTESIS</span> para probar</div>
+</header>
+
+<section id="s1">
+  <h2><span class="n">01</span>Resumen ejecutivo</h2>
+  <p><b>Posicionamiento propuesto.</b> Un proveedor de ropa deportiva y casual para quienes revenden en Colombia: boutiques, tiendas de barrio y vendedoras por Instagram y WhatsApp. Su ventaja es la transparencia: <b>precio por volumen visible, mínimo que se completa mezclando referencias, pedido armado en minutos y pago en línea</b>.</p>
+  <div class="grid2">
+    <div class="box"><h3>El hueco del mercado</h3><p class="small">En los mayoristas colombianos revisados, las condiciones se esconden detrás de WhatsApp (Belife), se exige registro con una cuota de $400.000 (Tenfit Express) o se publica el mínimo sin mostrar cómo baja el precio con el volumen (Babalú). <span class="tag t-inf">INFERENCIA</span> Un mayorista que resuelve las 9 preguntas del comprador sin conversación previa quita el mayor punto de fricción del canal.</p></div>
+    <div class="box"><h3>Urgencia de calendario</h3><p class="small">Hoy es 28 de septiembre. Las boutiques compran en octubre y noviembre la mercancía que venden en Black Friday (27 de noviembre) y en diciembre, que es la temporada de la prima y del estreno. <span class="tag t-inf">INFERENCIA</span> Si el canal mayorista no está en línea antes de mediados de noviembre, esta temporada se pierde. Por eso el roadmap tiene una fase puente.</p></div>
+  </div>
+  <div class="call"><b>Decisión de plataforma (te llevo la contraria en un punto)</b>Elegiste construir la web a medida. Me parece viable, pero <b>no conviene programar desde cero el carrito, el inventario, las listas de precios y los pagos</b>. Recomiendo una web a medida (Next.js) sobre un motor de comercio open-source con funciones B2B, como Medusa: grupos de clientes, listas de precio por grupo y por cantidad, e inventario por variante. Así mantienes el control del diseño y la velocidad sin reinventar lo que más riesgo tiene. <span class="tag t-sup">SUPUESTO</span> Hay equipo o presupuesto de desarrollo para 6 a 8 semanas.</div>
+  <h3>Las 5 decisiones que más impactan</h3>
+  <ol>
+    <li>Un solo catálogo: cada prenda muestra juntos su precio al detal y su precio por mayor. No hay dos sitios ni un selector de modo.</li>
+    <li>Precio por mayor desde <b>12 piezas</b> en el pedido completo, mezclando referencias, tallas y colores. El precio cambia solo al llegar a 12.</li>
+    <li>Tabla de cantidades por talla y color en cada ficha, más una vista de «Pedido rápido» para todo el catálogo.</li>
+    <li>Una barra de progreso que muestra cuánto falta para el mínimo y para el siguiente descuento. Es la palanca principal para subir el ticket.</li>
+    <li>Un surtido de colores que cruza tendencias Pantone con el calendario colombiano, controlado para no inmovilizar inventario.</li>
+  </ol>
+</section>
+
+<section id="s2">
+  <h2><span class="n">02</span>Análisis de mercado</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Señal</th><th>Contenido</th><th>Tipo</th><th>Implicación</th></tr></thead>
+    <tbody>
+      <tr><td>Crecimiento del e-commerce</td><td>En el primer trimestre de 2026 las transacciones en línea crecieron 22,2%: 186,35 millones de transacciones y $39,72 billones en ventas (Marketing4eCommerce).</td><td><span class="tag t-dato">DATO</span></td><td>El canal sigue en expansión. Vender en línea ya no es lo difícil; lo difícil es diferenciarse.</td></tr>
+      <tr><td>Peso de la moda</td><td>Moda y ropa es la categoría con mayor volumen histórico. En la temporada del Mundial 2026 concentró cerca del 70% de la facturación asociada (AmericaRetail).</td><td><span class="tag t-dato">DATO</span></td><td>Hay demanda. También hay mucha competencia.</td></tr>
+      <tr><td>Medios de pago</td><td>La tarjeta de crédito lidera. PSE, Nequi y otros pagos locales son indispensables. La contraentrega sigue siendo muy usada por quien desconfía del pago en línea.</td><td><span class="tag t-dato">DATO</span></td><td>El checkout debe ofrecer PSE, Nequi, Bancolombia y tarjeta. Contraentrega solo al detal.</td></tr>
+      <tr><td>Athleisure en Colombia</td><td>Un blog comercial (Kikluxe) reporta que el segmento vale USD 3.200 millones, crece 18% al año y que los leggings son el producto #1 para revendedores.</td><td><span class="tag t-req">NO VERIFICADO</span></td><td>La fuente es un vendedor y no cita estudio. Úsala como orientación, no como cifra.</td></tr>
+      <tr><td>Canales de venta de revendedores</td><td>Los revendedores venden sobre todo por Instagram, TikTok y grupos de WhatsApp.</td><td><span class="tag t-inf">PATRÓN OBSERVADO</span></td><td>El mayorista necesita fotos listas para publicar y un pedido que se pueda compartir por WhatsApp.</td></tr>
+      <tr><td>Calendario comercial</td><td>Black Friday en Colombia: 27 de noviembre de 2026, además de una edición en junio. La fecha del Día sin IVA depende de decreto.</td><td><span class="tag t-dato">DATO</span> / <span class="tag t-req">VALIDAR</span></td><td>Octubre y noviembre son meses de reposición mayorista. Diciembre es venta al detal.</td></tr>
+      <tr><td>Clima</td><td>Colombia no tiene estaciones. Bogotá y el altiplano son fríos; la costa y los valles, cálidos.</td><td><span class="tag t-dato">DATO</span></td><td>Las tendencias de otoño-invierno aplican parcialmente. Se necesita surtido para los dos climas.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">No pude consultar Google Trends ni reportes pagos (WGSN, Fashion Snoops) desde esta sesión. <span class="tag t-req">VALIDAR CON DATOS REALES</span> Revisa en Google Trends Colombia «conjunto deportivo mujer», «legging», «ropa por mayor» y «camiseta oversize» comparando octubre, noviembre y diciembre de 2024 y 2025.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="n">03</span>Análisis de competencia</h2>
+  <p class="small muted">Revisión de páginas públicas del 28 de septiembre de 2026. Son observaciones de lo publicado, no una auditoría interna.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Marca</th><th>Mínimo / condiciones</th><th>Precio visible</th><th>Cómo se pide</th><th>Fortaleza</th><th>Oportunidad para ti</th></tr></thead>
+    <tbody>
+      <tr><th>Babalú (Medellín)</th><td>$800.000; envío gratis desde $999.000</td><td>Sí, precio único mayorista ($38k–$138k)</td><td>Carrito + WhatsApp + catálogo PDF</td><td>Mínimo repetido 2 veces arriba; navegación por deporte (yoga, running, pilates)</td><td>No muestra escalas por volumen. El PDF es fricción en móvil.</td></tr>
+      <tr><th>Belife (CI Creytex)</th><td>−35% de $500k a $2,5M; −40% desde $2,5M</td><td>No en la página mayorista</td><td>WhatsApp o correo, asesoría previa</td><td>Respaldo de empresa textil con 50 años; material de marketing para tiendas</td><td>El proceso es consultivo y lento. No hay autoservicio.</td></tr>
+      <tr><th>Tenfit Express</th><td>Cuota de ingreso de $400.000</td><td>Sí, tras registro ($23k–$50k+)</td><td>Carrito con login</td><td>Carrito real, política mayorista publicada, categorías por deporte</td><td>La cuota y el registro frenan al revendedor que apenas empieza.</td></tr>
+      <tr><th>Nativos</th><td>Flete gratis desde $750.000</td><td>—</td><td>—</td><td>Fabricante de deportiva femenina</td><td>No se pudo leer el contenido. <span class="tag t-req">REVISAR MANUAL</span></td></tr>
+      <tr><th>Vorela / Olala / Licras y Estilo</th><td>Desde 2 a 6 prendas mezclando referencias</td><td>Variable</td><td>WhatsApp / tienda</td><td>Mínimos por unidades muy bajos</td><td>Compiten por accesibilidad. Tu mínimo de 12 piezas debe compensarse con precio, surtido y servicio.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Patrones que se repiten</h3>
+  <ul>
+    <li>WhatsApp es el canal principal de cierre. <span class="tag t-inf">INFERENCIA</span> Eliminarlo sería un error; hay que convertirlo en un destino con el pedido ya armado.</li>
+    <li>El mínimo se expresa en pesos, casi siempre entre $500.000 y $800.000. En Medellín también hay mínimos por unidad (El Hueco: 3 a 12 por color o talla).</li>
+    <li>Estética: fondos neutros, negro y blanco, un acento (vinotinto, coral o azul). Hay poca diferenciación visual entre marcas.</li>
+    <li>Ninguno de los revisados muestra en la ficha una tabla de precio por volumen ni una barra hacia el siguiente descuento.</li>
+  </ul>
+</section>
+
+<section id="s4">
+  <h2><span class="n">04</span>Perfil del cliente mayorista</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Segmento</th><th>Quién es</th><th>Cuánto compra</th><th>Qué necesita</th><th>Objeción principal</th></tr></thead>
+    <tbody>
+      <tr><th>Revendedora digital</th><td>Mujer de 20 a 40 años que vende por Instagram, WhatsApp o catálogo. Muchas veces empieza con poco capital.</td><td>12–36 piezas, cada 3 a 6 semanas <span class="tag t-sup">SUPUESTO</span></td><td>Fotos para publicar, surtido armado, tallas S-M-L, margen claro</td><td>«¿Y si no vendo? No puedo dejar plata quieta.»</td></tr>
+      <tr><th>Boutique física</th><td>Tienda de barrio o de centro comercial en ciudad intermedia</td><td>36–100 piezas, mensual</td><td>Curvas completas, reposición rápida, factura</td><td>«¿Llega igual a la foto? ¿Cumplen los tiempos?»</td></tr>
+      <tr><th>Gimnasio o estudio</th><td>Box, estudio de pilates o gimnasio que vende ropa a sus socios</td><td>12–40 piezas, trimestral</td><td>Pocas referencias técnicas, colores sobrios</td><td>«¿Me sirve para entrenar de verdad?»</td></tr>
+      <tr><th>Distribuidor</th><td>Compra para varias tiendas o para otra región</td><td>72+ piezas</td><td>Precio fijo, asesor, crédito, exclusividad</td><td>«¿Van a venderle al lado mío al mismo precio?»</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Cómo compara proveedores</b> <span class="tag t-inf">INFERENCIA</span>: precio unitario, mínimo real, calidad de tela (opacidad del legging, que no se estire), rapidez de despacho, facilidad para cambiar tallas y si le entregan fotos. Vuelve a comprar si el primer pedido llega completo y a tiempo y si lo que compró se vendió.</p>
+</section>
+
+<section id="s5">
+  <h2><span class="n">05</span>Buyer journey mayorista</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Etapa</th><th>Necesidad</th><th>Objeción</th><th>Información</th><th>Confianza</th><th>CTA</th></tr></thead>
+    <tbody>
+      <tr><th>Descubrimiento</th><td>Encontrar un proveedor confiable</td><td>«Otro mayorista más»</td><td>Qué venden, mínimo y descuento arriba del todo</td><td>Instagram activo, reseñas de Google</td><td>Ver precios mayoristas</td></tr>
+      <tr><th>Evaluación</th><td>Saber si le da el margen</td><td>«No sé cuánto gano»</td><td>Tabla de niveles y calculadora de margen</td><td>Precio detal sugerido</td><td>Armar mi pedido</td></tr>
+      <tr><th>Confianza</th><td>Evitar una estafa o mala calidad</td><td>«¿Existe de verdad?»</td><td>NIT, dirección, fotos del taller, composición de la tela</td><td>Testimonios reales con Instagram de la tienda</td><td>Hablar con un asesor</td></tr>
+      <tr><th>Selección</th><td>Armar el surtido</td><td>«Es muy dispendioso»</td><td>Tabla talla × color, stock por celda</td><td>Aviso de «Quedan 3» (real)</td><td>Sumar curva completa</td></tr>
+      <tr><th>Pedido</th><td>Llegar al mínimo</td><td>«No me alcanza»</td><td>Barra de progreso hacia el mínimo y el siguiente nivel</td><td>Ahorro en pesos visible</td><td>Finalizar pedido mayorista</td></tr>
+      <tr><th>Pago</th><td>Pagar como acostumbra</td><td>«¿Y si pago y no llega?»</td><td>PSE, Nequi, Bancolombia, tarjeta</td><td>Pasarela reconocida, factura</td><td>Pagar de forma segura</td></tr>
+      <tr><th>Envío</th><td>Saber cuándo llega</td><td>«Siempre se demoran»</td><td>Despacho en 24–48 h y guía por WhatsApp</td><td>Seguimiento con transportadora nombrada</td><td>Ver estado del pedido</td></tr>
+      <tr><th>Recompra</th><td>Reponer lo que se vendió</td><td>«Tengo que armar todo otra vez»</td><td>Historial de pedidos y novedades</td><td>Consistencia de tallas y color entre lotes</td><td>Repetir pedido</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s6">
+  <h2><span class="n">06</span>Estrategia comercial</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Precio</th><th>Piezas en el pedido</th><th>Descuento sobre detal</th><th>Beneficio extra</th></tr></thead>
+    <tbody>
+      <tr><td>Detal</td><td>1 a 11</td><td>—</td><td>Envío gratis desde $199.900</td></tr>
+      <tr><td>Por mayor</td><td>12 a 35</td><td>−35%</td><td>Mezcla libre de referencias, tallas y colores</td></tr>
+      <tr><td>Mayor Plus</td><td>36 a 71</td><td>−40%</td><td>Envío gratis</td></tr>
+      <tr><td>Distribuidor</td><td>72 o más</td><td>−45%</td><td>Asesor asignado, transferencia con factura</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><span class="tag t-sup">SUPUESTO</span> Mínimo por piezas a pedido tuyo; está en el rango de la competencia (Vorela 6 prendas, El Hueco 3 a 12 por color o talla). Los descuentos se calibraron con Belife (−35/−40%). <span class="tag t-req">DATO REQUERIDO</span> Tu costo por prenda: con el margen real se confirma que el −45% es rentable.</p>
+  <h3>Palancas comerciales</h3>
+  <ul>
+    <li><b>Kit Emprendedora (12 piezas):</b> un surtido preparado en tallas S, M y L, en colores de alta rotación. Resuelve el «no sé qué pedir» y la barrera del primer pedido.</li>
+    <li><b>Fotos para revender:</b> fotos sin logo, descargables desde la ficha para mayoristas registrados. Elimina una objeción que ningún competidor revisado resuelve de forma visible.</li>
+    <li><b>Repetir pedido:</b> un botón en el historial que precarga el carrito con el último pedido, y una alerta por WhatsApp cuando entran novedades.</li>
+    <li><b>Precio detal sugerido</b> en cada ficha. Protege el precio del mercado y permite calcular el margen.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2><span class="n">07</span>Diferenciación</h2>
+  <div class="grid3">
+    <div class="box"><h3>Transparencia</h3><p class="small">Los tres niveles de precio se ven en cada ficha. No hay que escribir para preguntar el precio.</p></div>
+    <div class="box"><h3>Rapidez para armar</h3><p class="small">Un pedido de 40 prendas se arma en una sola tabla, sin agregar variante por variante.</p></div>
+    <div class="box"><h3>Acompañamiento</h3><p class="small">El pedido se puede enviar armado por WhatsApp. El asesor confirma en lugar de transcribir.</p></div>
+  </div>
+</section>
+
+<section id="s8">
+  <h2><span class="n">08</span>Sitemap</h2>
+<pre>INICIO
+├── MUJER            → Deportiva (leggings, tops, conjuntos, bikers) · Casual (camisetas, joggers, conjuntos lounge)
+├── HOMBRE           → Deportiva (camisetas dry-fit, pantalonetas, joggers) · Casual (polos, oversize, bermudas)
+├── NOVEDADES
+├── MÁS VENDIDOS
+├── COMPRAR POR MAYOR
+│   ├── Cómo funciona + niveles + calculadora
+│   ├── Pedido rápido (catálogo en tabla)
+│   ├── Kit Emprendedora
+│   ├── Condiciones (pagos, envíos, cambios)
+│   └── Hablar con un asesor (formulario → WhatsApp)
+├── COLECCIONES      → Temporada oct–dic · Básicos todo el año
+├── PRODUCTO /[slug]
+├── MI CUENTA        → Pedidos · Repetir pedido · Fotos para revender · Facturas
+├── AYUDA            → Preguntas frecuentes · Envíos · Cambios y devoluciones · Guía de tallas
+├── NOSOTROS         → Taller, proceso, empresa (NIT)
+└── CONTACTO</pre>
+  <p class="small">Cambio frente a la estructura base: <b>Mujer y Hombre se dividen por línea (deportiva o casual)</b> y no por prenda en el primer nivel. «Ofertas» queda fuera del menú; aparece solo en temporada, para no entrenar al mayorista a esperar descuentos.</p>
+</section>
+
+<section id="s9">
+  <h2><span class="n">09</span>Home, de arriba abajo</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Sección</th><th>Objetivo</th><th>Duda que resuelve</th><th>CTA</th></tr></thead>
+    <tbody>
+      <tr><th>Barra de anuncio rotativa</th><td>Condiciones visibles en todas las páginas</td><td>¿Cuál es el mínimo? ¿Envían a mi ciudad?</td><td>—</td></tr>
+      <tr><th>Header</th><td>Navegación, búsqueda y pedido</td><td>¿Dónde encuentro lo que busco?</td><td>Comprar por mayor</td></tr>
+      <tr><th>Hero</th><td>Qué venden, para quién, diferenciador y acción</td><td>¿Qué venden? ¿Venden por mayor?</td><td>Ver precios mayoristas (principal) · Comprar al detal</td></tr>
+      <tr><th>Franja de 4 datos</th><td>Responder las objeciones sin hacer scroll</td><td>Mínimo, descuento, despacho, pago</td><td>—</td></tr>
+      <tr><th>Categorías</th><td>Descubrimiento rápido</td><td>¿Tienen lo que busco?</td><td>Ir a la categoría</td></tr>
+      <tr><th>Calculadora de volumen</th><td>Mostrar el margen</td><td>¿Cuánto gano?</td><td>Armar mi pedido</td></tr>
+      <tr><th>Más vendidos</th><td>Reducir el riesgo de elegir mal</td><td>¿Qué se vende?</td><td>Ver producto</td></tr>
+      <tr><th>Cómo pedir, en 4 pasos</th><td>Bajar la incertidumbre del proceso</td><td>¿Cómo hago el pedido?</td><td>—</td></tr>
+      <tr><th>Colores de temporada</th><td>Guiar el surtido de octubre a diciembre</td><td>¿Qué colores compro ahora?</td><td>Ver en ese color</td></tr>
+      <tr><th>Confianza</th><td>Credibilidad verificable</td><td>¿Existen? ¿Cumplen?</td><td>— <span class="tag t-req">DATO REQUERIDO</span></td></tr>
+      <tr><th>Preguntas frecuentes</th><td>Cerrar objeciones</td><td>Registro, pago, envío, cambios</td><td>—</td></tr>
+      <tr><th>Botón flotante de WhatsApp</th><td>Contacto con un toque</td><td>¿Cómo hablo con alguien?</td><td>Asesor</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s10">
+  <h2><span class="n">10</span>Catálogo</h2>
+  <ul>
+    <li><b>Filtros:</b> género, línea, talla, color (muestras de color con nombre), disponibilidad y precio. En móvil, un panel inferior con el botón «Ver resultados».</li>
+    <li><b>Chips</b> con los filtros activos, que se quitan con un toque.</li>
+    <li><b>Orden:</b> relevancia, novedades y precio. Más adelante, «más vendidos por mayoristas».</li>
+    <li><b>Tarjeta:</b> las muestras de color cambian la foto. Muestra el precio al detal y, debajo, el precio por mayor «desde 12 pzs».</li>
+    <li><b>Vista «Pedido rápido»</b> (solo mayorista): una tabla talla × color por referencia, con el stock en cada celda.</li>
+    <li><b>Búsqueda</b> por nombre, SKU, color («azul princesa») y categoría, con autocompletado, sugerencias y un mensaje útil si no hay resultados. En producción: tolerancia a errores de digitación, por ejemplo «lggin» → leggings.</li>
+  </ul>
+</section>
+
+<section id="s11">
+  <h2><span class="n">11</span>Ficha de producto</h2>
+  <div class="grid2">
+    <div class="box"><h3>Común a las dos formas de compra</h3><ul class="small">
+      <li>Galería de 5 a 7 fotos por color: frente, espalda, detalle de tela, modelo en movimiento y prueba de opacidad (para leggings). Video de 10 a 15 segundos.</li>
+      <li>Nombre, SKU y línea.</li>
+      <li>Color con nombre visible.</li>
+      <li>Composición, ajuste, guía de tallas en centímetros y cuidado.</li>
+      <li>Garantías cortas: envío, pago seguro y cambios.</li>
+      <li>Productos para combinar.</li></ul></div>
+    <div class="box"><h3>Diferencias</h3><ul class="small">
+      <li><b>Dos tarjetas de precio lado a lado</b> («Al detal» y «Por mayor»), que también funcionan como pestañas.</li><li><b>Al detal:</b> talla con stock, cantidad y «Agregar al pedido».</li>
+      <li><b>Por mayor:</b> tabla de precios por piezas con el nivel actual resaltado, tabla talla × color con totales, atajo «Sumar curva completa», barra de nivel y «Cotiza con un asesor» para más de 100 unidades.</li></ul></div>
+  </div>
+</section>
+
+<section id="s12">
+  <h2><span class="n">12</span>Experiencia mayorista</h2>
+  <p>El mayorista debe poder responder las 9 preguntas clave sin hablar con nadie. Así se resuelven en el prototipo:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Pregunta</th><th>Dónde se responde</th></tr></thead>
+    <tbody>
+      <tr><td>¿Qué venden?</td><td>Hero, categorías</td></tr>
+      <tr><td>¿Cuánto cuesta?</td><td>Tarjetas y ficha (rango y tabla de niveles)</td></tr>
+      <tr><td>¿Cuál es el mínimo?</td><td>Barra de anuncio, franja de datos, preguntas frecuentes, barra del pedido</td></tr>
+      <tr><td>¿Qué colores y tallas hay?</td><td>Muestras de color y tabla talla × color con stock</td></tr>
+      <tr><td>¿Cuánto ahorro por volumen?</td><td>Calculadora y total con ahorro en el pedido</td></tr>
+      <tr><td>¿Cómo hago el pedido?</td><td>4 pasos y pedido rápido</td></tr>
+      <tr><td>¿Cómo pago?</td><td>Franja de datos, ficha y checkout</td></tr>
+      <tr><td>¿Cómo me lo envían?</td><td>Barra de anuncio, ficha y preguntas frecuentes</td></tr>
+      <tr><td>¿Cómo contacto a un asesor?</td><td>Botón flotante, pedido por WhatsApp y formulario</td></tr>
+    </tbody>
+  </table></div>
+  <div class="call"><b>Decisión abierta: ¿precios mayoristas públicos o con registro?</b>El prototipo los muestra sin registro porque es lo que menos fricción tiene. El riesgo real es que <b>el cliente final de una boutique vea el costo de su proveedora</b>. Propongo probarlo (ver A/B, H1): la variante B pide celular y nombre del negocio, con acceso inmediato y sin aprobación manual. De paso captura el contacto para la recompra.</div>
+</section>
+
+<section id="s13">
+  <h2><span class="n">13</span>Experiencia detal</h2>
+  <p>Inicio → Categoría → Producto → Carrito → Checkout → Pago → Envío. El comprador al detal ve el precio por mayor como referencia, pero compra con talla y cantidad, sin tablas. Si su pedido llega a 12 piezas, recibe precio por mayor. El checkout es sin cuenta y suma Addi (cuotas) y contraentrega, que no se ofrecen al mayorista por el riesgo de devolución en pedidos grandes.</p>
+  <p class="small"><b>Compartido:</b> catálogo, fichas, búsqueda, carrito y checkout. <b>Separado:</b> precios, tabla de cantidades, barra de nivel, medios de pago, datos de facturación y la página «Comprar por mayor».</p>
+</section>
+
+<section id="s14">
+  <h2><span class="n">14</span>Estrategia de color</h2>
+  <p>Separamos cuatro sistemas de color que no deben mezclarse:</p>
+  <div class="grid2">
+    <div class="box"><h3>Producto</h3><p class="small">Colores de prendas y colecciones. Los define la tendencia, la rotación y el riesgo de inventario.</p></div>
+    <div class="box"><h3>Branding</h3><p class="small">Identidad: tinta casi negra, blanco cálido y tipografía condensada.</p></div>
+    <div class="box"><h3>UI</h3><p class="small">Botones, estados y badges. Una sola acción de color: el azul mayorista.</p></div>
+    <div class="box"><h3>Editorial</h3><p class="small">Banners y campañas. Aquí sí entran los colores de temporada, por ejemplo rojo chili en diciembre.</p></div>
+  </div>
+  <h3>Lectura cruzada de las cuatro fuentes Pantone</h3>
+  <p class="small">Fuentes: Color del Año 2026 (Cloud Dancer), NYFW Otoño-Invierno 26/27 (febrero de 2026) y NYFW Primavera-Verano 27 (21 de septiembre de 2026, con 10 colores destacados y 5 atemporales cada uno). Una familia de color pesa más cuando aparece en varios reportes independientes:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Familia</th><th>Presencia</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td><i class="sw" style="background:#00539C"></i>Azules</td><td>OI: All Aboard + Poseidon (atemporal) · PV: Princess Blue + Blue Indigo (atemporal)</td><td>La señal más consistente: está en los 4 bloques.</td></tr>
+      <tr><td><i class="sw" style="background:#5E5A3E"></i>Verdes oliva y herbales</td><td>OI: Burnt Olive, Green Envy, Neptune Green · PV: Tarragon (atemporal), Daiquiri Green, Waterfall</td><td>Muy fuerte. El oliva ya es un básico en ropa deportiva.</td></tr>
+      <tr><td><i class="sw" style="background:#9B1B30"></i>Rojos y rosados</td><td>OI: Festival Fuchsia, Red Mahogany, Foxglove · PV: Chili Pepper, Hibiscus, Rosy Future, Langoustino</td><td>Fuerte y encaja con diciembre en Colombia.</td></tr>
+      <tr><td><i class="sw" style="background:#EFEDE8"></i>Blancos cálidos</td><td>Cloud Dancer (Color del Año) · Egret · Antique White</td><td>Base neutra, además del blanco de Año Nuevo.</td></tr>
+      <tr><td><i class="sw" style="background:#7A5539"></i>Cafés</td><td>OI: Toffee, Arabian Spice, Candied Ginger · PV: Arrowwood</td><td>Buenos para la línea casual de hombre (bermudas, polos).</td></tr>
+      <tr><td><i class="sw" style="background:#EEDFA6"></i>Amarillos</td><td>OI: Acacia · PV: Anise Flower</td><td>Señal media que coincide con el amarillo de Año Nuevo colombiano.</td></tr>
+      <tr><td><i class="sw" style="background:#C4B7D5"></i>Lavandas y malvas</td><td>OI: Foxglove · PV: Lavender Oil</td><td>Media. Funciona en conjuntos de mujer.</td></tr>
+      <tr><td><i class="sw" style="background:#F2643A"></i>Naranjas</td><td>PV: Dragon Fire, Langoustino</td><td>Una sola temporada: para prueba.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><b>Regla:</b> que Pantone señale un color como tendencia no demuestra que se venda. Estos colores son candidatos para probar con el surtido, no una predicción de ventas.</p>
+  <h3>Matriz de inteligencia cromática</h3>
+  <p class="small muted">Pasarelas = presencia en los reportes Pantone de NYFW (derivados de pasarela). Medios = cobertura observada (Marie Claire, WWD, FashionUnited). Mercado y competencia = observación de sitios colombianos. «Sin dato» significa que no hay una fuente verificable.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Color</th><th>Pantone</th><th>Pasarelas</th><th>Medios</th><th>Mercado CO</th><th>Competencia</th><th>Público</th><th>Potencial</th><th>Rol</th></tr></thead>
+    <tbody>
+      <tr><td><i class="sw" style="background:#1B1B1D"></i>Negro</td><td>—</td><td>—</td><td>—</td><td>Alta (señalado como el más seguro)</td><td>Saturado</td><td>Todos</td><td>Alto</td><td>CORE</td></tr>
+      <tr><td><i class="sw" style="background:#2C3950"></i>Azul noche</td><td>Blue Indigo 19-3928 · Poseidon</td><td>Alta</td><td>Media</td><td>Alta (navy)</td><td>Media</td><td>H y M</td><td>Alto</td><td>CORE</td></tr>
+      <tr><td><i class="sw" style="background:#85848A"></i>Gris</td><td>Dolphin 16-2901 · Underworld</td><td>Alta (atemporal)</td><td>Baja</td><td>Alta</td><td>Media</td><td>H, unisex</td><td>Alto</td><td>CORE</td></tr>
+      <tr><td><i class="sw" style="background:#EFEDE8"></i>Blanco nube</td><td>Cloud Dancer 11-4201</td><td>Alta</td><td>Alta</td><td>Media (se ensucia en deportiva)</td><td>Baja</td><td>Casual</td><td>Medio-alto</td><td>CORE casual</td></tr>
+      <tr><td><i class="sw" style="background:#00539C"></i>Azul princesa</td><td>Princess Blue 19-4150</td><td>Alta</td><td>Media</td><td>Sin dato</td><td>Baja</td><td>M deportiva, H dry-fit</td><td>Alto</td><td>TREND</td></tr>
+      <tr><td><i class="sw" style="background:#5E5A3E"></i>Oliva quemado</td><td>Burnt Olive 18-0521</td><td>Alta</td><td>Media</td><td>Media</td><td>Media</td><td>H y M</td><td>Alto</td><td>TREND</td></tr>
+      <tr><td><i class="sw" style="background:#BE8C7B"></i>Arcilla</td><td>Muted Clay 16-1330</td><td>Alta</td><td>Alta</td><td>Sin dato</td><td>Baja</td><td>M casual</td><td>Medio</td><td>TREND</td></tr>
+      <tr><td><i class="sw" style="background:#B4808F"></i>Malva</td><td>Foxglove 16-1710</td><td>Alta</td><td>Media</td><td>Sin dato</td><td>Media (rosados viejos)</td><td>M deportiva</td><td>Medio</td><td>TREND</td></tr>
+      <tr><td><i class="sw" style="background:#B0306F"></i>Fucsia festival</td><td>Festival Fuchsia 19-2434</td><td>Alta</td><td>Alta</td><td>Sin dato</td><td>Baja</td><td>M 18–35</td><td>Medio</td><td>STATEMENT</td></tr>
+      <tr><td><i class="sw" style="background:#9B1B30"></i>Rojo chili</td><td>Chili Pepper 19-1557</td><td>Alta (PV27)</td><td>Media</td><td>Alta en diciembre <span class="tag t-inf">INF</span></td><td>Media (vinotinto)</td><td>Todos</td><td>Alto en diciembre</td><td>SEASONAL</td></tr>
+      <tr><td><i class="sw" style="background:#EEDFA6"></i>Amarillo anís</td><td>Anise Flower 12-0717</td><td>Media</td><td>Baja</td><td>Alta el 31 de diciembre <span class="tag t-inf">INF</span></td><td>Baja</td><td>M casual</td><td>Medio</td><td>SEASONAL</td></tr>
+      <tr><td><i class="sw" style="background:#CFDC6E"></i>Lima daiquiri</td><td>Daiquiri Green 12-0435</td><td>Media</td><td>Baja</td><td>Sin dato</td><td>Baja</td><td>Deportiva</td><td>Incierto</td><td>TEST</td></tr>
+      <tr><td><i class="sw" style="background:#F2643A"></i>Naranja dragón</td><td>Dragon Fire 16-1460</td><td>Media</td><td>Media</td><td>Sin dato</td><td>Baja</td><td>H dry-fit</td><td>Incierto</td><td>TEST</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Mezcla de inventario recomendada por referencia</h3>
+  <p>Máximo 5 colores por referencia: <b>3 core + 1 trend + 1 seasonal o test</b>. Distribución de unidades orientativa: 60% core · 25% trend · 10% statement o seasonal · 5% test. <span class="tag t-sup">SUPUESTO</span> <span class="tag t-req">VALIDAR CON DATOS REALES</span> Ajustar según la venta real por color cada 4 semanas.</p>
+</section>
+
+<section id="s15">
+  <h2><span class="n">15</span>Paleta Pantone final</h2>
+  <p class="small muted">Los HEX son aproximaciones digitales hechas a ojo: no son equivalencias físicas exactas. Antes de producir, valida con la guía física Pantone FHI (TCX) y una muestra de tela, porque el tinte sobre poliamida y sobre algodón da resultados distintos. Los códigos de los colores atemporales de otoño-invierno (Egret, Toffee, Poseidon, Underworld, Candied Ginger) no se pudieron verificar en una fuente pública.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Función</th><th>Color</th><th>Pantone</th><th>HEX aprox.</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>Base</td><td><i class="sw" style="background:#1B1B1D"></i>Negro</td><td>—</td><td>#1B1B1D</td><td>Todas las referencias</td></tr>
+      <tr><td>Base</td><td><i class="sw" style="background:#EFEDE8"></i>Blanco nube</td><td>Cloud Dancer 11-4201 TCX</td><td>#EFEDE8</td><td>Casual, camisetas</td></tr>
+      <tr><td>Base</td><td><i class="sw" style="background:#85848A"></i>Gris</td><td>Dolphin 16-2901 TCX</td><td>#85848A</td><td>Buzos, joggers, hombre</td></tr>
+      <tr><td>Core</td><td><i class="sw" style="background:#2C3950"></i>Azul noche</td><td>Blue Indigo 19-3928 TCX</td><td>#2C3950</td><td>Deportiva hombre y mujer</td></tr>
+      <tr><td>Core</td><td><i class="sw" style="background:#5E5A3E"></i>Oliva quemado</td><td>Burnt Olive 18-0521 TCX</td><td>#5E5A3E</td><td>Deportiva y casual</td></tr>
+      <tr><td>Tendencia</td><td><i class="sw" style="background:#00539C"></i>Azul princesa</td><td>Princess Blue 19-4150 TCX</td><td>#00539C</td><td>Conjuntos, dry-fit</td></tr>
+      <tr><td>Tendencia</td><td><i class="sw" style="background:#BE8C7B"></i>Arcilla</td><td>Muted Clay 16-1330 TCX</td><td>#BE8C7B</td><td>Casual mujer, bermudas</td></tr>
+      <tr><td>Tendencia</td><td><i class="sw" style="background:#B4808F"></i>Malva</td><td>Foxglove 16-1710 TCX</td><td>#B4808F</td><td>Leggings, tops</td></tr>
+      <tr><td>Tendencia</td><td><i class="sw" style="background:#9B1B30"></i>Rojo chili</td><td>Chili Pepper 19-1557 TCX</td><td>#9B1B30</td><td>Cápsula de diciembre</td></tr>
+      <tr><td>Acento UI (CTA)</td><td><i class="sw" style="background:#00539C"></i>Azul princesa</td><td>Princess Blue 19-4150 TCX</td><td>#00539C</td><td>Solo acciones mayoristas</td></tr>
+      <tr><td>Experimental</td><td><i class="sw" style="background:#CFDC6E"></i>Lima daiquiri</td><td>Daiquiri Green 12-0435</td><td>#CFDC6E</td><td>1 top y 1 dry-fit</td></tr>
+      <tr><td>Experimental</td><td><i class="sw" style="background:#F2643A"></i>Naranja dragón</td><td>Dragon Fire 16-1460 TCX</td><td>#F2643A</td><td>1 camiseta de hombre</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s16">
+  <h2><span class="n">16</span>UI</h2>
+  <div class="grid2">
+    <div class="box"><h3>Personalidad</h3><p class="small">Deportiva, directa y de fabricante. Tipografía condensada en mayúsculas, fondo blanco cálido, tinta casi negra y un único color de acción. Las fotos son las que ponen el color.</p></div>
+    <div class="box"><h3>Tokens de interfaz</h3><p class="small"><i class="sw" style="background:#F2F1EC"></i>Fondo #F2F1EC · <i class="sw" style="background:#17191C"></i>Tinta #17191C · <i class="sw" style="background:#D8D5CD"></i>Línea #D8D5CD · <i class="sw" style="background:#00539C"></i>Mayorista #00539C (contraste de unos 7:1 sobre el fondo) · <i class="sw" style="background:#1FAF55"></i>WhatsApp, solo en su botón.</p></div>
+  </div>
+  <h3>Tipografía</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Rol</th><th>Fuente</th><th>Tamaño / peso / line-height</th></tr></thead>
+    <tbody>
+      <tr><td>H1</td><td>Archivo (ancho 70–72), mayúsculas</td><td>clamp(36px→74px) / 800 / 1.02</td></tr>
+      <tr><td>H2</td><td>Archivo (ancho 78), mayúsculas</td><td>clamp(26px→38px) / 800 / 1.05</td></tr>
+      <tr><td>H3</td><td>Archivo</td><td>18px / 700 / 1.2</td></tr>
+      <tr><td>Texto</td><td>Archivo (ancho 100)</td><td>16px / 400 / 1.55</td></tr>
+      <tr><td>Botones</td><td>Archivo</td><td>16px / 700, altura mínima de 48px</td></tr>
+      <tr><td>Etiquetas, SKU, niveles</td><td>IBM Plex Mono</td><td>11–12px / 500, espaciado de letras +0,1em</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Una sola familia variable (Archivo) cubre el título condensado y el texto normal, así que se descarga una fuente en vez de dos o tres. En producción: alojarla en el propio servidor, con subconjunto latino y <code>font-display: swap</code>.</p>
+  <h3>Fotografía</h3>
+  <ul class="small">
+    <li><b>Producto:</b> fondo continuo del mismo tono en todas las fotos, luz suave lateral, proporción 4:5, sin sombras duras. Es lo que permite comparar colores entre fichas.</li>
+    <li><b>Modelo:</b> tallas S y L reales, indicando la talla que lleva («Modelo: 1,65 m, talla S»). Genera confianza en el ajuste.</li>
+    <li><b>Detalle:</b> tela, costura, pretina y prueba de opacidad en sentadilla. Resuelve la objeción de calidad.</li>
+    <li><b>Lifestyle:</b> gimnasio y calle en ciudades colombianas, solo para banners y redes. En la ficha distrae de la evaluación.</li>
+    <li><b>Video:</b> 10–15 segundos, en bucle y sin sonido, cargado solo cuando entra en pantalla.</li>
+  </ul>
+  <p class="small"><span class="tag t-req">DATO REQUERIDO</span> El prototipo usa siluetas vectoriales. Sin fotos reales no se debe publicar.</p>
+</section>
+
+<section id="s17">
+  <h2><span class="n">17</span>Animaciones</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Elemento</th><th>Animación</th><th>Objetivo</th><th>Intensidad</th><th>Riesgo</th></tr></thead>
+    <tbody>
+      <tr><td>Barra de anuncio</td><td>Rota 3 mensajes cada 4,2 s con fundido</td><td>Mostrar las condiciones sin ocupar más espacio</td><td>Baja</td><td>Distraer. Se detiene si el usuario pidió reducir movimiento.</td></tr>
+      <tr><td>Hero</td><td>Rota prendas y colores de temporada</td><td>Mostrar que hay variedad de color</td><td>Media</td><td>Peso del LCP. Es SVG o imagen ligera, nunca video.</td></tr>
+      <tr><td>Muestras de color en tarjetas</td><td>Cambia la imagen al pasar el cursor o tocar</td><td>Ver el color sin entrar a la ficha</td><td>Baja</td><td>Precargar solo la segunda imagen.</td></tr>
+      <tr><td>Contador del carrito</td><td>Rebote corto al agregar</td><td>Confirmar la acción</td><td>Baja</td><td>Ninguno</td></tr>
+      <tr><td>Barra de nivel</td><td>El ancho crece al sumar unidades</td><td>Motivar el siguiente nivel</td><td>Media</td><td>Ninguno. Es la animación que más valor aporta.</td></tr>
+      <tr><td>Panel del pedido</td><td>Desliza desde la derecha (0,35 s)</td><td>No perder el contexto de la página</td><td>Baja</td><td>Hay que manejar el foco del teclado.</td></tr>
+      <tr><td>Talla sin elegir</td><td>Sacudida corta del selector</td><td>Señalar el error sin un mensaje modal</td><td>Baja</td><td>Acompañarla de texto para lectores de pantalla.</td></tr>
+      <tr><td>Parallax y animaciones al hacer scroll</td><td>Descartadas</td><td>—</td><td>—</td><td>Afectan INP y batería y no aportan a la compra.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s18">
+  <h2><span class="n">18</span>Mobile first</h2>
+  <ul>
+    <li>Header compacto: menú, logo y pedido. El buscador va en una segunda línea, siempre visible.</li>
+    <li>Filtros en un panel inferior, con «Ver resultados» fijo abajo.</li>
+    <li>Tabla talla × color con scroll horizontal propio, campos numéricos de 52×38 px y teclado numérico (<code>inputmode="numeric"</code>).</li>
+    <li>Objetivos táctiles de 44 px o más. Botones de 48 px.</li>
+    <li>El botón de WhatsApp no tapa el botón de compra; en producción se oculta mientras el panel del pedido está abierto.</li>
+    <li>Checkout en una sola columna, con el resumen primero y autocompletado del navegador para nombre, teléfono y dirección.</li>
+  </ul>
+</section>
+
+<section id="s19">
+  <h2><span class="n">19</span>Performance</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Métrica</th><th>Presupuesto (móvil 4G)</th></tr></thead>
+    <tbody>
+      <tr><td>LCP</td><td>&lt; 2,5 s</td></tr>
+      <tr><td>INP</td><td>&lt; 200 ms</td></tr>
+      <tr><td>CLS</td><td>&lt; 0,1</td></tr>
+      <tr><td>JavaScript inicial</td><td>&lt; 150 KB comprimido</td></tr>
+      <tr><td>Peso de la Home</td><td>&lt; 1,2 MB</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="small">
+    <li>Imágenes en AVIF o WebP con tamaños adaptados y carga diferida debajo del primer pantallazo. La imagen del hero, con <code>fetchpriority="high"</code>.</li>
+    <li>Páginas de catálogo generadas estáticamente y revalidadas con cada cambio de stock. Precio y stock se piden aparte.</li>
+    <li>WhatsApp como enlace <code>wa.me</code>, no como widget de chat de terceros. Un solo script de analítica, cargado después de la interacción.</li>
+    <li>Nada de carruseles automáticos de terceros, de plugins de reseñas pesados ni de videos en el hero.</li>
+    <li>CDN con caché larga para archivos estáticos y caché corta para el stock.</li>
+  </ul>
+  <h3>Stack recomendado para la web a medida</h3>
+  <p class="small">Next.js (App Router) + Medusa v2 (listas de precio por grupo de cliente y por cantidad) + PostgreSQL + pasarela local (Wompi u otra con PSE, Nequi y Bancolombia) + imágenes en CDN + transportadora con API de guías. <span class="tag t-hip">HIPÓTESIS</span> Compara el costo y el tiempo frente a Shopify con apps B2B antes de comprometer el presupuesto.</p>
+</section>
+
+<section id="s20">
+  <h2><span class="n">20</span>Copy</h2>
+  <div class="grid2">
+    <div class="box"><h3>Headline</h3><p><b>Ropa deportiva y casual para surtir tu tienda</b></p><p class="small muted">Alternativa: «Precio por mayor desde 12 piezas, mezclando referencias»</p></div>
+    <div class="box"><h3>Subheadline</h3><p class="small">Leggings, conjuntos, camisetas, joggers y buzos para hombre y mujer. Cada prenda muestra su precio al detal y su precio por mayor. Desde 12 piezas, mezclando referencias, tallas y colores, todo pasa a precio por mayor.</p></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Lugar</th><th>Texto</th></tr></thead>
+    <tbody>
+      <tr><td>CTA principal mayorista</td><td>Ver precios mayoristas · Armar mi pedido · Finalizar pedido mayorista</td></tr>
+      <tr><td>CTA detal</td><td>Comprar al detal · Agregar al carrito · Ir a pagar</td></tr>
+      <tr><td>CTA de soporte</td><td>Hablar con un asesor · Enviar pedido a un asesor por WhatsApp · Cotiza con un asesor</td></tr>
+      <tr><td>Barra de nivel</td><td>«Te faltan $X para el mínimo mayorista» · «Suma $X y pasas a Mayorista Plus (−40%)»</td></tr>
+      <tr><td>Ficha mayorista</td><td>«El mínimo se cuenta sobre el pedido completo: mezcla esta prenda con otras referencias, tallas y colores.»</td></tr>
+      <tr><td>Sin resultados</td><td>«Sin resultados para “x”. Prueba con “legging”, “oversize” o un color.»</td></tr>
+      <tr><td>Stock</td><td>«Quedan 3» solo si es verdad. Nunca urgencia inventada.</td></tr>
+      <tr><td>Checkout</td><td>«Sin crear cuenta. Al pagar te enviamos el resumen al correo y WhatsApp.»</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Evitar frases vacías como «Calidad que inspira» o «Estilo que te define». Cada frase debe poder comprobarse.</p>
+</section>
+
+<section id="s21">
+  <h2><span class="n">21</span>CRO: prioridades</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Prioridad</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td class="p0"><b>P0</b></td><td>Fotos reales, 5 a 7 por color · mínimo y niveles visibles · tabla talla × color · checkout con PSE y Nequi · WhatsApp con el pedido armado · datos verificables (NIT, dirección)</td></tr>
+      <tr><td class="p0"><b>P0</b></td><td>Stock real por variante. Vender algo agotado destruye la confianza del mayorista.</td></tr>
+      <tr><td class="p1"><b>P1</b></td><td>Barra de nivel · Kit Emprendedora · repetir pedido · precio detal sugerido · guía de tallas en centímetros</td></tr>
+      <tr><td class="p2"><b>P2</b></td><td>Fotos para revender · búsqueda que tolera errores · alertas de reposición por WhatsApp · reseñas por producto</td></tr>
+      <tr><td class="p3"><b>P3</b></td><td>Precios públicos o con registro · colores de prueba · calculadora de margen en la Home</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s22">
+  <h2><span class="n">22</span>A/B testing</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Hipótesis</th><th>Variable</th><th>A</th><th>B</th><th>Métrica</th><th>Criterio</th></tr></thead>
+    <tbody>
+      <tr><td>H1</td><td>Pedir registro instantáneo para ver precios no baja los pedidos y sí sube los contactos capturados</td><td>Acceso al precio</td><td>Público</td><td>Celular + nombre del negocio</td><td>Pedidos mayoristas por sesión; contactos</td><td>No bajar más de 10% en pedidos, con al menos 400 sesiones por variante</td></tr>
+      <tr><td>H2</td><td>La barra de nivel sube el ticket mayorista</td><td>Barra en el pedido</td><td>Sin barra</td><td>Con barra</td><td>Ticket promedio mayorista</td><td>Diferencia significativa al 95%</td></tr>
+      <tr><td>H3</td><td>Un CTA de precio convierte más que uno de catálogo</td><td>CTA del hero</td><td>Ver catálogo</td><td>Ver precios mayoristas</td><td>Clics → agregar al pedido</td><td>Al 95%, mínimo 2 semanas</td></tr>
+      <tr><td>H4</td><td>El Kit Emprendedora sube la conversión del primer pedido</td><td>Kit en la Home</td><td>Sin kit</td><td>Con kit</td><td>Conversión de primer pedido</td><td>Al 95%</td></tr>
+      <tr><td>H5</td><td>El pedido rápido por defecto acelera el armado</td><td>Pestaña por defecto en la ficha</td><td>Al detal</td><td>Por mayor</td><td>Tiempo hasta el mínimo; conversión</td><td>Mediana de tiempo −20% sin bajar la conversión</td></tr>
+      <tr><td>H6</td><td>El botón «Enviar pedido por WhatsApp» no le quita pagos al checkout</td><td>Botón secundario</td><td>Visible</td><td>Solo tras 60 s o al salir</td><td>Pedidos totales (web + WhatsApp)</td><td>Total cerrado</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Con poco tráfico al inicio, es mejor probar en secuencia (dos semanas A, dos semanas B) con precaución, o medir con 5 a 8 entrevistas por segmento. No se declara ganador antes de tener los datos.</p>
+</section>
+
+<section id="s23">
+  <h2><span class="n">23</span>Métricas</h2>
+  <div class="grid3">
+    <div class="box"><h3>Adquisición</h3><p class="small">Sesiones por canal (Instagram, TikTok, Google, WhatsApp) · % de sesiones que abren la pestaña «Por mayor»</p></div>
+    <div class="box"><h3>Engagement</h3><p class="small">Búsquedas y búsquedas sin resultados · fichas vistas por sesión · uso del pedido rápido</p></div>
+    <div class="box"><h3>Conversión</h3><p class="small">Agregar al carrito · inicio de checkout · compra · conversión mayorista y detal por separado · pedidos por WhatsApp</p></div>
+    <div class="box"><h3>Comercial</h3><p class="small">Ticket mayorista · unidades por pedido · % de pedidos por nivel · margen por color · recompra a 30, 60 y 90 días · valor del cliente mayorista</p></div>
+    <div class="box"><h3>UX</h3><p class="small">LCP, INP y CLS reales · abandono en el checkout por paso · errores de pago · tiempo hasta llegar al mínimo</p></div>
+    <div class="box"><h3>Color</h3><p class="small">Venta y sell-through por color · agotados y sobrestock por color cada 4 semanas</p></div>
+  </div>
+</section>
+
+<section id="s24">
+  <h2><span class="n">24</span>Roadmap</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Fase</th><th>Fechas</th><th>Entregable</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><th>0. Datos</th><td>29 sep – 5 oct</td><td>Costos, mínimo y niveles definitivos, fotos (sesión de 1 a 2 días), catálogo real con SKU y stock, WhatsApp Business, NIT y políticas</td><td>Sin esto no se puede publicar nada</td></tr>
+      <tr><th>A. Puente mayorista</th><td>6 – 26 oct</td><td>Catálogo, fichas, pedido rápido, barra de nivel y pedido por WhatsApp + enlaces de pago. Sin cuentas.</td><td>Captar la compra de temporada de octubre y noviembre</td></tr>
+      <tr><th>B. Checkout completo</th><td>27 oct – 20 nov</td><td>Pasarela integrada, stock sincronizado, correos y WhatsApp transaccional, detal completo</td><td>Estar listos una semana antes de Black Friday (27 de noviembre)</td></tr>
+      <tr><th>C. Recompra</th><td>dic – ene</td><td>Cuentas mayoristas, repetir pedido, fotos para revender, facturación</td><td>El mayorista que compró en noviembre vuelve en enero</td></tr>
+      <tr><th>D. Optimización</th><td>ene →</td><td>Pruebas H1–H6, búsqueda avanzada, reseñas, contenido SEO por categoría</td><td>Mejorar con datos propios</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s25">
+  <h2><span class="n">25</span>Checklist final</h2>
+  <div class="grid2">
+    <div class="box"><h3>Antes de publicar</h3><ul class="small">
+      <li>☐ Fotos reales en todas las variantes</li>
+      <li>☐ Precios, mínimo y niveles confirmados contra el costo</li>
+      <li>☐ Stock real por variante</li>
+      <li>☐ PSE, Nequi, Bancolombia y tarjeta probados con pagos reales pequeños</li>
+      <li>☐ Número de WhatsApp Business real en el código</li>
+      <li>☐ NIT, dirección y políticas de envío, cambios y datos personales (Ley 1581)</li>
+      <li>☐ Testimonios reales o ninguno</li></ul></div>
+    <div class="box"><h3>Calidad</h3><ul class="small">
+      <li>☐ LCP menor a 2,5 s en móvil medido</li>
+      <li>☐ Flujo completo probado en Android de gama media</li>
+      <li>☐ Navegación con teclado y contraste AA</li>
+      <li>☐ Analítica de eventos: agregar, checkout, compra, WhatsApp, pestaña Por mayor</li>
+      <li>☐ Metadatos, datos estructurados de producto y sitemap.xml</li>
+      <li>☐ Sin «[DATO REQUERIDO]» visible en el sitio</li></ul></div>
+  </div>
+</section>
+
+<section id="s26">
+  <h2><span class="n">26</span>Color: ahora → diciembre</h2>
+  <p class="small">El surtido se decide un mes antes de venderse. Lo que el mayorista compra en octubre se vende en noviembre y diciembre.</p>
+  <div class="month">
+    <div><h3>Ahora</h3><p class="eyebrow">28 sep – 5 oct</p></div>
+    <div><p class="small"><b>Colores:</b> negro, azul noche, gris, oliva quemado. <b>Tendencia:</b> atemporales de OI 26/27 y de PV 27. <b>Evidencia:</b> el azul y el oliva aparecen en los dos reportes; el negro, el gris y el navy son los más seguros según el mercado local (fuente comercial, no verificada). <b>Aplicación:</b> definir la producción de noviembre con 60% en estos colores; la Home y el catálogo arrancan con la selección de octubre.</p>
+    <div class="bar"><i style="background:#1B1B1D"></i><i style="background:#2C3950"></i><i style="background:#85848A"></i><i style="background:#5E5A3E"></i></div></div>
+  </div>
+  <div class="month">
+    <div><h3>Octubre</h3><p class="eyebrow">Pedido de temporada</p></div>
+    <div><p class="small"><b>Colores:</b> oliva quemado, arcilla, malva, azul noche. Toffee en casual de hombre. Naranja dragón como prueba para Halloween (31 de octubre). <b>Tendencia:</b> la paleta tierra de OI 26/27 (Muted Clay, Foxglove, Burnt Olive). <b>Evidencia:</b> reporte Pantone NYFW OI 26/27 y su cobertura en medios (Marie Claire, DesignTAXI). No hay datos de venta local. <b>Aplicación:</b> colección «Temporada» en la Home, conjuntos de mujer en malva y oliva, correo y WhatsApp a mayoristas con el surtido sugerido. Funciona mejor en ciudades frías (Bogotá, Tunja, Pasto) que en la costa.</p>
+    <div class="bar"><i style="background:#5E5A3E"></i><i style="background:#BE8C7B"></i><i style="background:#B4808F"></i><i style="background:#2C3950"></i><i style="background:#7A5539"></i></div></div>
+  </div>
+  <div class="month">
+    <div><h3>Noviembre</h3><p class="eyebrow">Black Friday · 27 nov</p></div>
+    <div><p class="small"><b>Colores:</b> negro, gris y azul noche para rotación; azul princesa como tendencia; fucsia festival como color de impacto. <b>Tendencia:</b> Princess Blue (PV 27) y Festival Fuchsia (OI 26/27). <b>Evidencia:</b> la familia de azules está en los 4 bloques Pantone; el fucsia es un destacado de OI con buena cobertura en medios. <b>Aplicación:</b> los descuentos de Black Friday van sobre los colores core con inventario suficiente. El statement se vende a precio completo. Los banners usan azul princesa. <span class="tag t-inf">INFERENCIA</span> Descontar colores de tendencia enseña al mercado a esperar la rebaja.</p>
+    <div class="bar"><i style="background:#1B1B1D"></i><i style="background:#85848A"></i><i style="background:#00539C"></i><i style="background:#B0306F"></i></div></div>
+  </div>
+  <div class="month">
+    <div><h3>Diciembre</h3><p class="eyebrow">Prima · estreno · vacaciones</p></div>
+    <div><p class="small"><b>Colores:</b> rojo chili (Navidad), blanco nube (Año Nuevo, vacaciones), amarillo anís (tradición del 31), lavanda y lima como prueba para clima cálido. <b>Tendencia:</b> la paleta PV 27 (Chili Pepper, Anise Flower, Lavender Oil) y Cloud Dancer, el Color del Año. <b>Evidencia:</b> Pantone da la señal de tendencia; las costumbres colombianas del rojo en Navidad y el blanco y el amarillo en Año Nuevo son una <span class="tag t-inf">INFERENCIA</span> cultural sin datos de venta. <b>Aplicación:</b> cápsula «Estreno» de 4 a 6 referencias con pocas unidades por color. El pedido mayorista para esta cápsula debe cerrarse antes del 20 de noviembre.</p>
+    <div class="bar"><i style="background:#9B1B30"></i><i style="background:#EFEDE8"></i><i style="background:#EEDFA6"></i><i style="background:#C4B7D5"></i><i style="background:#CFDC6E"></i></div></div>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Paleta core</h3><p class="small"><i class="sw" style="background:#1B1B1D"></i>Negro · <i class="sw" style="background:#2C3950"></i>Azul noche · <i class="sw" style="background:#85848A"></i>Gris · <i class="sw" style="background:#EFEDE8"></i>Blanco nube · <i class="sw" style="background:#5E5A3E"></i>Oliva quemado</p></div>
+    <div class="box"><h3>Paleta trend</h3><p class="small"><i class="sw" style="background:#00539C"></i>Azul princesa · <i class="sw" style="background:#BE8C7B"></i>Arcilla · <i class="sw" style="background:#B4808F"></i>Malva · <i class="sw" style="background:#7A5539"></i>Toffee</p></div>
+    <div class="box"><h3>Paleta statement</h3><p class="small"><i class="sw" style="background:#B0306F"></i>Fucsia festival · <i class="sw" style="background:#9B1B30"></i>Rojo chili (diciembre)</p></div>
+    <div class="box"><h3>Paleta test</h3><p class="small"><i class="sw" style="background:#CFDC6E"></i>Lima daiquiri · <i class="sw" style="background:#F2643A"></i>Naranja dragón · <i class="sw" style="background:#EEDFA6"></i>Amarillo anís</p></div>
+  </div>
+  <div class="box"><h3>Paleta web</h3><p class="small"><i class="sw" style="background:#F2F1EC"></i>Fondo #F2F1EC · <i class="sw" style="background:#E7E5DE"></i>Fondo de foto #E7E5DE · <i class="sw" style="background:#17191C"></i>Tinta y CTA de detal #17191C · <i class="sw" style="background:#00539C"></i>CTA mayorista #00539C · <i class="sw" style="background:#DDE7F2"></i>Fondo de nivel #DDE7F2 · <i class="sw" style="background:#2E7A4E"></i>Ahorro #2E7A4E · <i class="sw" style="background:#1FAF55"></i>WhatsApp #1FAF55. Los colores de temporada van solo en banners y fotos, nunca en botones.</p></div>
+</section>
+
+<section id="fuentes">
+  <h2>Fuentes</h2>
+  <ul class="small">
+    <li><a href="https://www.pantone.com/articles/press-releases/pantone-announces-color-of-the-year-2026-cloud-dancer">Pantone: Color del Año 2026, Cloud Dancer 11-4201</a></li>
+    <li><a href="https://fashionunited.com/news/fashion/pantone-nyfw-spring-summer-2027-color-trend-report-the-top-10-colors/2026092174743">FashionUnited: Pantone NYFW Primavera-Verano 2027 (21 sep 2026)</a> · <a href="https://wwd.com/fashion-news/fashion-trends/pantone-nyfw-spring-2027-color-trends-1239203317/">WWD</a></li>
+    <li><a href="https://designtaxi.com/news/427452/PANTONE-Fall-Winter-Color-Trends-For-2026-2027-Paint-A-Bold-Balancing-Act/">DesignTAXI: Pantone Otoño-Invierno 2026/27 (12 feb 2026)</a> · <a href="https://www.vooglam.com/blogDetail/2026-autumn-winter-pantone-color-palette-eyewear-guide">Códigos TCX OI 26/27</a> · <a href="https://www.marieclaire.com/fashion/pantone-new-york-fashion-week-fall-2026-fashion-color-trends/">Marie Claire</a></li>
+    <li><a href="https://marketing4ecommerce.co/crecimiento-del-ecommerce-colombiano/">Marketing4eCommerce: e-commerce en Colombia, primer trimestre de 2026</a> · <a href="https://americaretail-malls.com/paises/colombia/mundial-2026-impulsa-el-comercio-electronico-colombiano/">AmericaRetail: Mundial 2026 y moda</a> · <a href="https://carlosbetancur.co/blog/pasarelas-pago-e-commerce-colombia-2026/">Pasarelas de pago en Colombia 2026</a></li>
+    <li><a href="https://www.eltiempo.com/colombia/e-commerce-y-retail-proyectan-record-de-trafico-digital-para-el-black-friday-3561160">El Tiempo: Black Friday 2026</a> · <a href="https://www.minuto60.com/economia/black-friday-colombia-2026-fechas-promociones-junio/10216">Minuto60: fechas de Black Friday en Colombia 2026</a></li>
+    <li>Competencia: <a href="https://babalu.com.co/">Babalú</a> · <a href="https://belife.co/pages/quieres-vender-nuestra-marca">Belife</a> · <a href="https://www.mayorista.tenfitexpress.com/">Tenfit Express</a> · <a href="https://nativos.com.co/">Nativos</a> · <a href="https://vorela.com.co/pages/mayoritas">Vorela</a> · <a href="https://ola-laropadeportiva.com/mayoristas/">Olala</a> · <a href="https://licrasyestilo.com/pages/mayoristas">Licras y Estilo</a></li>
+    <li><a href="https://www.kikluxe.com/blog/ropa-deportiva-al-por-mayor-colombia-2026">Kikluxe: athleisure al por mayor 2026</a>. Fuente comercial; sus cifras no están verificadas.</li>
+  </ul>
+</section>
+</main>
+</div>

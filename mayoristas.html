@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Comprar por mayor · MARCA</title>
+  <meta name="description" content="Condiciones para comprar ropa deportiva y casual al por mayor: mínimo 12 piezas mezclando referencias, precios por volumen, pagos y envíos a toda Colombia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=IBM+Plex+Mono:wght@500&display=swap" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header id="site-header"></header>
+  <main>
+    <section class="wrap b2b-hero">
+      <p class="eyebrow">Para boutiques, tiendas, revendedores y vendedores por redes</p>
+      <h1 class="h1">Compra al por mayor sin llamadas ni listas en PDF</h1>
+      <p class="lead">Cada prenda muestra su precio por mayor. Desde 12 piezas en tu pedido, mezclando referencias, tallas y colores, pagas ese precio en línea. Si prefieres, un asesor arma el pedido contigo por WhatsApp.</p>
+      <div class="hero-cta">
+        <a class="btn btn-b2b" href="catalogo.html?vista=lista">Armar pedido ahora</a>
+        <a class="btn ghost" href="#asesor">Hablar con un asesor</a>
+      </div>
+    </section>
+
+    <section class="wrap section" style="padding-top:16px">
+      <div class="conditions">
+        <div><h3>Mínimo</h3><p>12 piezas en total. Sin mínimo por referencia, talla o color.</p></div>
+        <div><h3>Precio por volumen</h3><p>−35% desde 12 piezas, −40% desde 36 y −45% desde 72.</p></div>
+        <div><h3>Pago</h3><p>PSE, Nequi, Bancolombia y tarjeta. Distribuidores: transferencia con factura electrónica.</p></div>
+        <div><h3>Despacho</h3><p>24–48 h hábiles con guía. Envío gratis desde 36 piezas.</p></div>
+        <div><h3>Recompra</h3><p>Tu pedido queda guardado. Lo repites con un clic y ajustas cantidades.</p></div>
+        <div><h3>Cambios</h3><p>[DATO REQUERIDO] Plazo y condiciones de cambio para mayoristas.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap section" id="niveles">
+      <div class="section-h"><h2>Niveles de precio</h2></div>
+      <div class="calc">
+        <div class="calc-in">
+          <label for="calc-range"><b>Piezas en tu pedido: <span id="calc-units"></span></b></label>
+          <input id="calc-range" type="range" min="1" max="120" step="1" value="36" />
+          <div class="tier-rows" id="tier-rows">
+            <div data-t="may1"><span>Por mayor</span><span>12 a 35 piezas · −35%</span></div>
+            <div data-t="may2"><span>Mayor Plus</span><span>36 a 71 piezas · −40% · envío gratis</span></div>
+            <div data-t="dist"><span>Distribuidor</span><span>72 piezas o más · −45% · asesor asignado</span></div>
+          </div>
+        </div>
+        <div class="calc-out">
+          <dl>
+            <div><dt>Vendes a detal sugerido</dt><dd id="calc-retail">—</dd></div>
+            <div><dt>Tu nivel</dt><dd id="calc-tier" style="font-size:1.2rem">—</dd></div>
+            <div><dt>Pagas</dt><dd id="calc-pay">—</dd></div>
+            <div><dt>Margen bruto estimado</dt><dd id="calc-margin" class="hl">—</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="section-h"><h2>Cómo funciona</h2></div>
+      <ol class="steps">
+        <li><h3>Elige “Por mayor”</h3><p>En la ficha de cada prenda, al lado del precio al detal.</p></li>
+        <li><h3>Usa el pedido rápido</h3><p>Una tabla por referencia: escribe cantidades por color y talla.</p></li>
+        <li><h3>Llega a 12 piezas</h3><p>La barra del pedido te dice cuántas piezas faltan para el precio por mayor y para el siguiente descuento.</p></li>
+        <li><h3>Paga o envía a un asesor</h3><p>Paga en línea o manda el pedido armado por WhatsApp para confirmarlo.</p></li>
+      </ol>
+    </section>
+
+    <section class="wrap section" id="asesor">
+      <div class="section-h"><div><h2>Pide catálogo o asesoría</h2><p class="muted">Respuesta en horario hábil. [DATO REQUERIDO] Tiempo real de respuesta.</p></div></div>
+      <form class="lead-form" id="lead-form">
+        <label>Nombre<input id="f-nombre" name="nombre" required autocomplete="name" /></label>
+        <label>Nombre del negocio<input id="f-negocio" name="negocio" required /></label>
+        <label>Ciudad<input id="f-ciudad" name="ciudad" required autocomplete="address-level2" /></label>
+        <label>Tipo de negocio
+          <select id="f-tipo" name="tipo">
+            <option>Boutique o tienda física</option>
+            <option>Venta por Instagram / WhatsApp</option>
+            <option>Distribuidor</option>
+            <option>Gimnasio o estudio</option>
+            <option>Otro</option>
+          </select>
+        </label>
+        <fieldset class="full" style="border:0;padding:0">
+          <legend class="label" style="font-family:inherit;text-transform:none;letter-spacing:0;font-size:.9rem;font-weight:600">Me interesa</legend>
+          <div class="opts">
+            <label class="chk"><input type="checkbox" name="interes" value="Deportiva mujer" id="i1" /> Deportiva mujer</label>
+            <label class="chk"><input type="checkbox" name="interes" value="Deportiva hombre" id="i2" /> Deportiva hombre</label>
+            <label class="chk"><input type="checkbox" name="interes" value="Casual mujer" id="i3" /> Casual mujer</label>
+            <label class="chk"><input type="checkbox" name="interes" value="Casual hombre" id="i4" /> Casual hombre</label>
+          </div>
+        </fieldset>
+        <div class="full"><button class="btn btn-b2b" type="submit">Continuar por WhatsApp</button></div>
+        <div class="full ok-box" id="lead-ok" hidden>
+          <p style="margin:0">Listo. Abre WhatsApp con tu mensaje ya escrito para que el asesor tenga tus datos.</p>
+          <a class="btn" id="lead-wa" target="_blank" rel="noopener" href="#">Abrir WhatsApp</a>
+        </div>
+      </form>
+    </section>
+
+    <section class="wrap section" id="faq">
+      <div class="section-h"><h2>Preguntas de mayoristas</h2></div>
+      <div class="faq">
+        <details><summary>¿Tengo que tener RUT o empresa?</summary><p>No para comprar por mayor. Para Distribuidor pedimos RUT para la factura electrónica. [VALIDAR con contabilidad]</p></details>
+        <details><summary>¿Puedo vender con mis fotos o con las de ustedes?</summary><p>[DATO REQUERIDO] Definir si se entregan fotos sin logo para revendedores. Es un beneficio que reduce una objeción frecuente.</p></details>
+        <details><summary>¿Hay precio de distribuidor exclusivo por ciudad?</summary><p>[DATO REQUERIDO] Definir si habrá exclusividad por zona.</p></details>
+        <details><summary>¿Qué pasa si una talla se agota después de pagar?</summary><p>Te avisamos antes de despachar y eliges: cambio por otra talla o color, o devolución del valor. [VALIDAR]</p></details>
+      </div>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

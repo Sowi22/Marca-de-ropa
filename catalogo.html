@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Catálogo · MARCA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=IBM+Plex+Mono:wght@500&display=swap" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header id="site-header"></header>
+  <main class="wrap">
+    <div class="cat-head">
+      <div>
+        <p class="eyebrow" id="result-count"></p>
+        <h1 class="h2" id="cat-title">Catálogo</h1>
+      </div>
+      <div class="cat-tools">
+        <button class="btn ghost sm open-filters" id="open-filters">Filtrar</button>
+        <div class="view-toggle" role="group" aria-label="Vista">
+          <button data-view="grid" aria-pressed="true">Fotos</button>
+          <button data-view="lista" aria-pressed="false">Pedido por mayor</button>
+        </div>
+        <label for="sort" class="sr">Ordenar</label>
+        <select id="sort">
+          <option value="rel">Relevancia</option>
+          <option value="nuevo">Novedades primero</option>
+          <option value="asc">Precio: menor a mayor</option>
+          <option value="desc">Precio: mayor a menor</option>
+        </select>
+      </div>
+    </div>
+    <div class="layout">
+      <aside class="filters" aria-label="Filtros">
+        <div class="filters-h"><b>Filtros</b><button class="icon-btn" data-close-filters aria-label="Cerrar filtros">✕</button></div>
+        <div id="filters-body"></div>
+        <p><button class="link small" id="clear-filters">Quitar todos los filtros</button></p>
+        <div class="filters-apply"><button class="btn block" data-close-filters>Ver resultados</button></div>
+      </aside>
+      <section>
+        <div class="chips" id="chips"></div>
+        <div id="grid" class="grid"></div>
+      </section>
+    </div>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

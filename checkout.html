@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Finalizar compra · MARCA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=IBM+Plex+Mono:wght@500&display=swap" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header id="site-header"></header>
+  <main class="wrap">
+    <div class="co-layout" id="checkout">
+      <form class="co" id="co-form">
+        <h1 class="h2">Finalizar compra</h1>
+        <p class="small muted">Sin crear cuenta. Al pagar te enviamos el resumen al correo y WhatsApp.</p>
+        <fieldset>
+          <legend>Tus datos</legend>
+          <label>Nombre completo<input id="co-name" required autocomplete="name" /></label>
+          <label>Celular (WhatsApp)<input id="co-tel" required type="tel" inputmode="tel" autocomplete="tel" /></label>
+          <label class="full">Correo<input id="co-mail" required type="email" autocomplete="email" /></label>
+          <label data-only="mayor">Nombre del negocio<input id="co-biz" /></label>
+          <label data-only="mayor">Cédula o NIT (para factura)<input id="co-nit" inputmode="numeric" /></label>
+        </fieldset>
+        <fieldset>
+          <legend>Envío</legend>
+          <label>Departamento
+            <select id="co-dep" required>
+              <option value="">Elige</option><option>Antioquia</option><option>Atlántico</option><option>Bogotá D.C.</option><option>Bolívar</option><option>Cundinamarca</option><option>Santander</option><option>Valle del Cauca</option><option>Otro</option>
+            </select>
+          </label>
+          <label>Ciudad o municipio<input id="co-city" required autocomplete="address-level2" /></label>
+          <label class="full">Dirección<input id="co-addr" required autocomplete="street-address" placeholder="Calle, número, barrio, apto" /></label>
+          <p class="full small muted" style="margin:0">Despacho en 24–48 h hábiles con Coordinadora, Servientrega o Interrapidísimo según destino. [VALIDAR transportadora]</p>
+        </fieldset>
+        <fieldset>
+          <legend>Pago</legend>
+          <div class="pay">
+            <label><input type="radio" name="pay" id="p-pse" checked /> PSE <small>Débito desde tu banco</small></label>
+            <label><input type="radio" name="pay" id="p-nequi" /> Nequi <small>Notificación en la app</small></label>
+            <label><input type="radio" name="pay" id="p-bcol" /> Botón Bancolombia <small>Sin salir de tu banca</small></label>
+            <label><input type="radio" name="pay" id="p-card" /> Tarjeta crédito o débito <small>Visa · Mastercard · Amex</small></label>
+            <label data-only="detal"><input type="radio" name="pay" id="p-addi" /> Addi <small>Paga en cuotas</small></label>
+            <label data-only="detal"><input type="radio" name="pay" id="p-cod" /> Contraentrega <small>Solo pedidos al detal · [SUPUESTO]</small></label>
+          </div>
+        </fieldset>
+        <button class="btn btn-b2b block" type="submit">Pagar de forma segura</button>
+        <div class="ok-box" id="co-done" hidden><b>Prototipo:</b> aquí se abriría la pasarela de pago (Wompi o similar). No se procesó ningún pago.</div>
+      </form>
+      <aside class="co-side">
+        <h2 style="font-size:1.2rem">Resumen</h2>
+        <div id="co-summary"></div>
+      </aside>
+    </div>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
