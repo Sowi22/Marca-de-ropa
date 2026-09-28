@@ -502,7 +502,7 @@
     }).join('');
     const float = $('#hero-float');
     if (float) {
-      const pieces = [['jersey', 'junior-l', 'Camiseta de fútbol'], ['legging', 'lima', 'Legging'], ['hoodie', 'blanco', 'Suéter con capota'], ['skirt', 'malva', 'Falda deportiva'], ['tee', 'negro', 'Camiseta dry-fit']];
+      const pieces = [['jersey', 'junior-v', 'Camiseta de fútbol'], ['legging', 'negro', 'Legging'], ['hoodie', 'plata', 'Suéter con capota'], ['skirt', 'rosa', 'Falda deportiva'], ['tee', 'negro', 'Camiseta dry-fit']];
       float.innerHTML = pieces.map(([g, c, l], i) => `<div class="fl fl-${i + 1}">${garmentSVG(g, c, l)}</div>`).join('');
     }
     $$('.collection-art[data-g]').forEach(el => { el.innerHTML = garmentSVG(el.dataset.g, el.dataset.c, el.closest('.collection').querySelector('h2').textContent); });

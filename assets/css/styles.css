@@ -7,9 +7,9 @@
   --ink-2: #4B4E53;
   --muted: #6D6F72;
   --line: #D8D5CD;
-  --b2b: #00539C;        /* Azul princesa 19-4150: acción mayorista */
-  --b2b-ink: #003D73;
-  --b2b-soft: #DDE7F2;
+  --b2b: #C42A3F;        /* Rojo Hibiscus: acción de compra (ver "Paleta de la marca" al final) */
+  --b2b-ink: #A51F33;
+  --b2b-soft: #FCE8EB;
   --ok: #2E7A4E;
   --warn: #9A5B00;
   --bad: #A3252F;
@@ -238,7 +238,7 @@ a.mega-h:hover { color: var(--ink); }
 .calc-out dl { margin: 0; display: grid; gap: 12px; }
 .calc-out dt { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
 .calc-out dd { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 75; font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-.calc-out .hl { color: #9CC3EA; }
+.calc-out .hl { color: #F2B6C3; }
 .tier-rows { display: grid; gap: 6px; }
 .tier-rows div { display: flex; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; font-variant-numeric: tabular-nums; transition: background .25s, border-color .25s, color .25s; }
 .tier-rows div.on { background: var(--b2b); border-color: var(--b2b); color: #fff; }
@@ -342,7 +342,7 @@ fieldset > *:not(legend) { clear: both; }
 .meter { display: grid; gap: 8px; padding: 12px 14px; background: var(--b2b-soft); border-radius: var(--radius); }
 .meter p { margin: 0; font-size: .9rem; }
 .meter.compact { border-radius: 0; }
-.track { position: relative; height: 8px; background: rgba(0,83,156,.18); border-radius: 4px; overflow: hidden; }
+.track { position: relative; height: 8px; background: var(--b2b-track); border-radius: 4px; overflow: hidden; }
 .track span { position: absolute; inset: 0 auto 0 0; background: var(--b2b); border-radius: 4px; transition: width .5s var(--ease); }
 .track i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--card); }
 
@@ -493,8 +493,6 @@ fieldset > *:not(legend) { clear: both; }
   --f-display: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
   --f-body: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
   --f-mono: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
-  --hero-bg: #00539C;     /* Azul princesa 19-4150 */
-  --hero-word: #CFDC6E;   /* Lima daiquiri 12-0435 */
 }
 body { font-size: 15px; letter-spacing: .005em; }
 code { font-family: 'IBM Plex Mono', ui-monospace, Consolas, monospace; }
@@ -636,3 +634,31 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 .c-hombre .collection-copy li { border-color: rgba(233, 235, 237, .22) !important; color: #C9CCCF; }
 .btn.silver { background: linear-gradient(100deg, #9A9DA1, #EEF0F2 45%, #A7AAAE 70%, #D9DBDE); color: var(--ink); border-color: #C9CCCF; }
 .btn.silver:hover { filter: brightness(1.08); }
+
+/* =====================================================================
+   Paleta de la marca (HEX aproximados de Pantone; validar con guía física)
+   - Protagonista: rojo Hibiscus 18-1762 TCX. Portada, precio por mayor,
+     botones de compra, etiquetas "Nuevo" y estados activos.
+   - Base: blanco, negro Jet Black 19-0303 TCX y gris claro para fotos.
+   - Secciones: Mujer en rosa Rosy Future 15-1910 TCX (familia del rojo);
+     Hombre en negro con plateado Pantone 877 C.
+   - Excepción: verde de WhatsApp, para que se reconozca el botón.
+   ===================================================================== */
+:root {
+  --brand: #DD3848;       /* Hibiscus: superficies grandes (portada) */
+  --b2b: #C42A3F;         /* Hibiscus oscurecido: texto y botones (5,6:1 sobre blanco) */
+  --b2b-ink: #A51F33;
+  --b2b-soft: #FCE8EB;
+  --b2b-track: rgba(196, 42, 63, .18);
+  --ink: #1C1C1E;         /* Jet Black */
+  --hero-bg: var(--brand);
+  --hero-word: #FFFFFF;
+}
+.tag:not(.dark) { background: var(--b2b); color: #fff; }
+.hero-full .hero-word { text-shadow: 0 6px 30px rgba(0, 0, 0, .12); }
+
+/* En tablet y celular el encabezado es más alto (lleva la búsqueda): bajar el titular */
+@media (max-width: 1023px) { .hero-full .hero-word { top: 178px; } .fl-1, .fl-3 { top: 200px; } }
+
+/* El rojo se reserva para precios por mayor y acciones de compra; las filas activas van en negro */
+.tiers tr.on td { background: var(--ink); color: #fff; }
