@@ -702,7 +702,6 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 .wp-line .sw { width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; }
 .wp-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 1rem; font-variant-numeric: tabular-nums; }
 .wp-total b { font-size: 1.3rem; }
-.wp-add:disabled { opacity: .45; cursor: default; transform: none; }
 
 /* Barra de progreso con las metas escritas debajo */
 .track-labels { position: relative; height: 16px; font-size: .68rem; font-weight: 700; color: var(--muted); }
@@ -729,3 +728,7 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 .wp-rule { margin: 0; padding: 10px 12px; background: var(--paper-2); font-size: .86rem; }
 .wp-rule.ok { background: #EAF4EE; color: var(--ok); font-weight: 600; }
 .line-rule { margin: 2px 0 0; font-size: .78rem; color: var(--b2b); font-weight: 600; }
+
+/* Aviso de guardado automático del pedido */
+.wp-saved { margin: 0; min-height: 1.2em; font-size: .82rem; font-weight: 600; color: var(--ok); }
+.wp-view:disabled { opacity: .45; cursor: default; transform: none; }

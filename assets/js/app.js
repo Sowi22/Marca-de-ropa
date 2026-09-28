@@ -358,32 +358,25 @@
     </div>`;
   }
 
-  // Compra por mayor paso a paso: 1) color, 2) cantidad por talla, 3) agregar al pedido.
-  // Las cantidades se preparan aquí y solo pasan al pedido al tocar el botón.
+  // Compra por mayor paso a paso: 1) color, 2) cantidad por talla, 3) resumen.
+  // Cada cambio se guarda solo en el pedido; no hay que tocar ningún botón para guardar.
   function wholesalePicker(p, root, opts) {
     opts = opts || {};
-    const key = (c, sz) => c + '|' + sz;
-    const draft = new Map();
-    const load = () => { draft.clear(); p.colors.forEach(c => p.sizes.forEach(sz => { const q = qtyInCart(p.id, c, sz); if (q) draft.set(key(c, sz), q); })); };
-    load();
-    let sel = opts.color || p.colors.find(c => p.sizes.some(sz => draft.get(key(c, sz)))) || p.colors[0];
-    const qOf = (c, sz) => draft.get(key(c, sz)) || 0;
+    const qOf = (c, sz) => qtyInCart(p.id, c, sz);
     const colorUnits = c => p.sizes.reduce((a, sz) => a + qOf(c, sz), 0);
-    const draftUnits = () => p.colors.reduce((a, c) => a + colorUnits(c), 0);
-    const cartOfProduct = () => state.cart.filter(i => i.id === p.id).reduce((a, i) => a + i.qty, 0);
-    const setQ = (c, sz, v) => { const st = window.stockFor(p.id, c, sz); v = Math.max(0, Math.min(st, v)); if (v) draft.set(key(c, sz), v); else draft.delete(key(c, sz)); };
+    let sel = opts.color || p.colors.find(c => colorUnits(c)) || p.colors[0];
+    const setQ = (c, sz, v) => {
+      const st = window.stockFor(p.id, c, sz);
+      v = Math.max(0, Math.min(st, v));
+      if (v !== qOf(c, sz)) setLine(p.id, c, sz, v);
+    };
 
     function draw(focus) {
-      const n = draftUnits(), inCart = cartOfProduct();
-      // Cómo quedaría el pedido: las otras prendas que ya cumplen + esta si llega a 4.
-      const others = qualifyingUnits() - (inCart >= MIN_REF ? inCart : 0);
-      const orderUnits = others + (n >= MIN_REF ? n : 0);
-      const t = tierFor(orderUnits), price = t && n >= MIN_REF ? wholesale(p, t.off) : p.price;
+      const n = refUnits(p.id), price = unitPrice(p);
+      const chosen = p.colors.filter(c => colorUnits(c));
       const refNote = !n ? `Mínimo <b>${MIN_REF} piezas de esta prenda</b> para precio por mayor. Puedes mezclar colores y tallas.`
         : n < MIN_REF ? `Te ${MIN_REF - n === 1 ? 'falta' : 'faltan'} <b>${MIN_REF - n}</b> de esta prenda para llegar al mínimo de ${MIN_REF} (puedes mezclar colores y tallas).`
         : `✓ Esta prenda ya cumple el mínimo de ${MIN_REF} piezas.`;
-      const chosen = p.colors.filter(c => colorUnits(c));
-      const changed = p.colors.some(c => p.sizes.some(sz => qOf(c, sz) !== qtyInCart(p.id, c, sz)));
       root.innerHTML = `
         <div class="wp">
           <p class="wp-step"><span class="wp-n">1</span>Elige el color</p>
@@ -400,30 +393,29 @@
           }).join('')}</div>
           <button type="button" class="link wp-curve">+ 1 de cada talla en ${C[sel].name}</button>
 
-          <p class="wp-step"><span class="wp-n">3</span>Revisa y agrega</p>
+          <p class="wp-step"><span class="wp-n">3</span>Tu pedido de esta prenda</p>
           <div class="wp-summary">${chosen.length ? chosen.map(c => `<div class="wp-line"><span><i class="sw" style="background:${swBg(c)}"></i><b>${C[c].name}</b> · ${p.sizes.filter(sz => qOf(c, sz)).map(sz => `talla ${sz}: ${qOf(c, sz)}`).join(', ')}</span><button type="button" class="link wp-clear" data-c="${c}">Quitar</button></div>`).join('')
             : '<p class="muted small">Todavía no has elegido tallas.</p>'}</div>
           <p class="wp-rule ${n >= MIN_REF ? 'ok' : ''}">${refNote}</p>
           <div class="wp-total"><span>${pz(n)} × ${cop(price)}</span><b>${cop(n * price)}</b></div>
-          <button type="button" class="btn btn-b2b block wp-add" ${changed ? '' : 'disabled'}>${!changed && inCart ? '✓ Ya está en tu pedido' : inCart ? `Actualizar pedido (${pz(n)})` : n ? `Agregar ${pz(n)} al pedido` : 'Elige tallas para agregar'}</button>
-          ${tierMeter(false, orderUnits)}
+          <p class="wp-saved" aria-live="polite">${n ? '✓ Se guarda solo en tu pedido' : ''}</p>
+          <button type="button" class="btn btn-b2b block wp-view" ${cartUnits() ? '' : 'disabled'}>Ver mi pedido${cartUnits() ? ` (${pz(cartUnits())})` : ''}</button>
+          ${tierMeter(false)}
         </div>`;
 
+      const changed = () => { draw(focus); if (opts.onAdd) opts.onAdd(); };
       $$('.wp-color', root).forEach(b => b.addEventListener('click', () => { sel = b.dataset.c; if (opts.onColor) opts.onColor(sel); draw(); }));
-      $$('.stepper button', root).forEach(b => b.addEventListener('click', () => { setQ(sel, b.dataset.s, qOf(sel, b.dataset.s) + (+b.dataset.d)); draw({ s: b.dataset.s, d: b.dataset.d }); }));
+      $$('.stepper button', root).forEach(b => b.addEventListener('click', () => {
+        setQ(sel, b.dataset.s, qOf(sel, b.dataset.s) + (+b.dataset.d));
+        focus = { s: b.dataset.s, d: b.dataset.d }; changed();
+      }));
       $$('.stepper input', root).forEach(i => {
         i.addEventListener('focus', () => i.select());
-        i.addEventListener('change', () => { setQ(sel, i.dataset.s, parseInt(i.value || '0', 10) || 0); draw(); });
+        i.addEventListener('change', () => { setQ(sel, i.dataset.s, parseInt(i.value || '0', 10) || 0); focus = null; changed(); });
       });
-      $('.wp-curve', root).addEventListener('click', () => { p.sizes.forEach(sz => setQ(sel, sz, qOf(sel, sz) + 1)); draw(); });
-      $$('.wp-clear', root).forEach(b => b.addEventListener('click', () => { p.sizes.forEach(sz => setQ(b.dataset.c, sz, 0)); draw(); }));
-      $('.wp-add', root).addEventListener('click', () => {
-        p.colors.forEach(c => p.sizes.forEach(sz => { if (qOf(c, sz) !== qtyInCart(p.id, c, sz)) setLine(p.id, c, sz, qOf(c, sz)); }));
-        toast(`Pedido actualizado: ${pz(draftUnits())} de ${p.name} <button class="link" id="t-open">Ver pedido</button>`);
-        $('#t-open').addEventListener('click', openCart);
-        load(); draw();
-        if (opts.onAdd) opts.onAdd();
-      });
+      $('.wp-curve', root).addEventListener('click', () => { p.sizes.forEach(sz => setQ(sel, sz, qOf(sel, sz) + 1)); focus = null; changed(); });
+      $$('.wp-clear', root).forEach(b => b.addEventListener('click', () => { p.sizes.forEach(sz => setQ(b.dataset.c, sz, 0)); focus = null; changed(); }));
+      $('.wp-view', root).addEventListener('click', openCart);
       if (focus) { const b = $(`.stepper button[data-s="${focus.s}"][data-d="${focus.d}"]`, root); if (b && !b.disabled) b.focus(); }
     }
     draw();
