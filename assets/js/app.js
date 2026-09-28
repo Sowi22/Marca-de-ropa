@@ -143,7 +143,7 @@
       <span class="mega-h">Destacados</span>
       <ul><li><a href="catalogo.html?genero=${g}&tag=nuevo">Novedades</a></li>
         <li><a href="catalogo.html?genero=${g}&tag=bestseller">Más vendidos</a></li>
-        <li><a href="catalogo.html?genero=${g}&vista=lista">Pedido por mayor</a></li>
+        <li><a href="catalogo.html?genero=${g}&vista=lista">Pedido al por mayor</a></li>
         <li><a class="mega-all" href="catalogo.html?genero=${g}">Ver todo ${g === 'mujer' ? 'Mujer' : 'Hombre'}</a></li></ul>
     </div>`;
     const feat = P.find(p => p.gender === g && p.tags.includes('bestseller'));
@@ -166,7 +166,7 @@
         <span class="mega-h">Cómo comprar por mayor</span>
         <ul><li><a href="mayoristas.html">Cómo funciona</a></li>
           <li><a href="mayoristas.html#niveles">Precios por cantidad</a></li>
-          <li><a href="catalogo.html?vista=lista">Pedido por mayor</a></li>
+          <li><a href="catalogo.html?vista=lista">Pedido al por mayor</a></li>
           <li><a href="mayoristas.html#faq">Preguntas de mayoristas</a></li>
           <li><a href="mayoristas.html#asesor">Hablar con un asesor</a></li></ul>
       </div>
@@ -288,7 +288,7 @@
           <p class="muted small">[DATO REQUERIDO] Razón social · NIT · Dirección de bodega · Horario de atención</p>
         </div>
         <div><h4>Comprar</h4><a href="catalogo.html?genero=mujer">Mujer</a><a href="catalogo.html?genero=hombre">Hombre</a><a href="catalogo.html?tag=nuevo">Novedades</a><a href="catalogo.html?tag=bestseller">Más vendidos</a></div>
-        <div><h4>Mayoristas</h4><a href="mayoristas.html">Cómo funciona</a><a href="mayoristas.html#niveles">Precios por volumen</a><a href="catalogo.html?vista=lista">Pedido rápido</a><a href="mayoristas.html#asesor">Hablar con un asesor</a></div>
+        <div><h4>Mayoristas</h4><a href="mayoristas.html">Cómo funciona</a><a href="mayoristas.html#niveles">Precios por volumen</a><a href="catalogo.html?vista=lista">Pedido al por mayor</a><a href="mayoristas.html#asesor">Hablar con un asesor</a></div>
         <div><h4>Ayuda</h4><a href="mayoristas.html#faq">Preguntas frecuentes</a><a href="#">Envíos y tiempos</a><a href="#">Cambios y devoluciones</a><a href="#">Guía de tallas</a></div>
       </div>
       <div class="wrap legal small muted">Prototipo navegable · precios, mínimos y stock son supuestos de demostración.</div>`;
@@ -685,7 +685,12 @@
       render();
     });
     $('#sort').addEventListener('change', e => { f.sort = e.target.value; render(); });
-    $$('.view-toggle button').forEach(b => b.addEventListener('click', () => { f.view = b.dataset.view; render(); }));
+    // "Al detal" o "Pedido al por mayor": también define la pestaña con la que abre la ficha de producto.
+    $$('.view-toggle button').forEach(b => b.addEventListener('click', () => {
+      f.view = b.dataset.view;
+      state.tab = f.view === 'lista' ? 'mayor' : 'detal'; save();
+      render();
+    }));
     $('#open-filters').addEventListener('click', () => document.body.classList.add('filters-open'));
     $$('[data-close-filters]').forEach(b => b.addEventListener('click', () => document.body.classList.remove('filters-open')));
     $('#clear-filters').addEventListener('click', () => {
