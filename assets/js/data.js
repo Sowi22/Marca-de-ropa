@@ -23,6 +23,24 @@ window.COLORS = {
   fuego:     { name: 'Naranja dragón',   hex: '#F2643A', pantone: 'Dragon Fire 16-1460 TCX',   role: 'test' }
 };
 
+// Equipaciones de fútbol: colores aproximados, sin escudos ni logos.
+// Formato: [color principal, color secundario (rayas o ribete), ¿rayas?].
+// [VALIDAR] licencia de cada club antes de vender.
+const TEAM_KITS = {
+  junior:      { name: 'Junior',                 local: ['#D01F2E', '#FFFFFF', true], visit: ['#F4F4F4', '#D01F2E'] },
+  america:     { name: 'América de Cali',        local: ['#C8102E', '#FFFFFF'],       visit: ['#F4F4F4', '#C8102E'] },
+  nacional:    { name: 'Atlético Nacional',      local: ['#0B7A3E', '#FFFFFF', true], visit: ['#F4F4F4', '#0B7A3E'] },
+  millonarios: { name: 'Millonarios',            local: ['#1C3F94', '#FFFFFF'],       visit: ['#F4F4F4', '#1C3F94'] },
+  santafe:     { name: 'Independiente Santa Fe', local: ['#D0102D', '#FFFFFF'],       visit: ['#F4F4F4', '#D0102D'] },
+  cali:        { name: 'Deportivo Cali',         local: ['#0E7A3B', '#FFFFFF'],       visit: ['#F4F4F4', '#0E7A3B'] },
+  medellin:    { name: 'Independiente Medellín', local: ['#D21F2A', '#1D3C8F'],       visit: ['#1D3C8F', '#D21F2A'] }
+};
+Object.entries(TEAM_KITS).forEach(([k, t]) => {
+  window.COLORS[k + '-l'] = { name: 'Local',     hex: t.local[0], hex2: t.local[1], stripes: !!t.local[2], pantone: t.name + ' · equipación local', role: 'equipo' };
+  window.COLORS[k + '-v'] = { name: 'Visitante', hex: t.visit[0], hex2: t.visit[1], pantone: t.name + ' · equipación visitante', role: 'equipo' };
+});
+window.TEAMS = Object.fromEntries(Object.entries(TEAM_KITS).map(([k, t]) => [k, t.name]));
+
 // Precio por mayor por CANTIDAD de piezas en el pedido completo (se mezclan
 // referencias, tallas y colores). [SUPUESTO] Ajustar al costo real.
 window.TIERS = [
@@ -39,64 +57,106 @@ window.BUSINESS = {
   city: '[CIUDAD DE DESPACHO]'       // [DATO REQUERIDO]
 };
 
+// Tallas: mujer en numeración colombiana, hombre en letras, pantalón en cintura.
+const DAMA = ['6', '8', '10', '12'];
+const CABALLERO = ['S', 'M', 'L', 'XL', 'XXL'];
+const UNISEX = ['S', 'M', 'L', 'XL'];
+const PANTALON = ['28', '30', '32', '34', '36'];
+
+// Páginas de categoría (migas de pan y tarjetas de la Home).
 window.CATEGORIES = [
-  { id: 'mujer-deportiva', name: 'Mujer deportiva', gender: 'mujer',  line: 'deportiva', garment: 'set',     color: 'malva' },
-  { id: 'hombre-deportiva', name: 'Hombre deportiva', gender: 'hombre', line: 'deportiva', garment: 'tee',   color: 'azulnoche' },
-  { id: 'mujer-casual',    name: 'Mujer casual',    gender: 'mujer',  line: 'casual',    garment: 'crop',    color: 'arcilla' },
-  { id: 'hombre-casual',   name: 'Hombre casual',   gender: 'hombre', line: 'casual',    garment: 'polo',    color: 'oliva' },
-  { id: 'conjuntos',       name: 'Conjuntos',       gender: 'mujer',  line: 'deportiva', garment: 'set',     color: 'princesa' },
-  { id: 'unisex',          name: 'Buzos y joggers', gender: 'unisex', line: 'casual',    garment: 'hoodie',  color: 'gris' }
+  { id: 'mujer-deportiva',  name: 'Deportiva mujer',       href: 'catalogo.html?genero=mujer&linea=deportiva',  garment: 'set',      color: 'malva',     tile: true },
+  { id: 'hombre-deportiva', name: 'Deportiva hombre',      href: 'catalogo.html?genero=hombre&linea=deportiva', garment: 'tee',      color: 'azulnoche', tile: true },
+  { id: 'futbol',           name: 'Camisetas de fútbol',   href: 'catalogo.html?linea=futbol',                  garment: 'jersey',   color: 'junior-l',  tile: true },
+  { id: 'conjuntos',        name: 'Conjuntos de gimnasio', href: 'catalogo.html?cat=conjuntos',                 garment: 'setskirt', color: 'princesa',  tile: true },
+  { id: 'mujer-casual',     name: 'Casual mujer',          href: 'catalogo.html?genero=mujer&linea=casual',     garment: 'crop',     color: 'arcilla',   tile: true },
+  { id: 'hombre-casual',    name: 'Casual hombre',         href: 'catalogo.html?genero=hombre&linea=casual',    garment: 'polo',     color: 'oliva',     tile: true },
+  { id: 'unisex',           name: 'Suéteres y joggers',    href: 'catalogo.html?cat=unisex' }
 ];
 
+const jersey = (team, gender, price, tags) => ({
+  id: 'futbol-' + team + (gender === 'mujer' ? '-dama' : ''),
+  sku: 'FB-' + team.slice(0, 3).toUpperCase() + (gender === 'mujer' ? '-D' : '-H'),
+  name: 'Camiseta ' + window.TEAMS[team] + (gender === 'mujer' ? ' dama' : ''),
+  cat: 'futbol', gender, line: 'futbol', garment: 'jersey', team,
+  price, colors: [team + '-l', team + '-v'], sizes: gender === 'mujer' ? DAMA : CABALLERO, tags: tags || [],
+  comp: 'Poliéster de secado rápido. [VALIDAR ficha técnica y licencia del club]',
+  fit: gender === 'mujer' ? 'Corte dama, entallado.' : 'Corte regular.'
+});
+
 window.PRODUCTS = [
+  /* Deportiva mujer: leggings, shorts, faldas, tops y conjuntos de gimnasio */
   { id: 'legging-flex', sku: 'MD-LEG-01', name: 'Legging Flex tiro alto', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'legging',
-    price: 89900, colors: ['negro','azulnoche','malva','oliva','chili'], sizes: ['6','8','10','12'], tags: ['bestseller'],
+    price: 89900, colors: ['negro','azulnoche','malva','oliva','chili'], sizes: DAMA, tags: ['bestseller'],
     comp: '78% poliamida, 22% elastano. Tela de compresión media, opaca en sentadilla.', fit: 'Ajustado, tiro alto con pretina ancha.' },
-  { id: 'top-core', sku: 'MD-TOP-02', name: 'Top Core soporte medio', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'bra',
-    price: 59900, colors: ['negro','malva','lavanda','princesa','lima'], sizes: ['6','8','10','12'], tags: ['bestseller'],
-    comp: '80% poliamida, 20% elastano. Copas removibles.', fit: 'Ajustado. Soporte medio para entrenamiento funcional.' },
-  { id: 'conjunto-studio', sku: 'MD-SET-03', name: 'Conjunto Studio top + legging', cat: 'conjuntos', gender: 'mujer', line: 'deportiva', garment: 'set',
-    price: 149900, colors: ['princesa','malva','oliva','negro','fucsia'], sizes: ['6','8','10','12'], tags: ['nuevo','bestseller'],
-    comp: '78% poliamida, 22% elastano.', fit: 'Ajustado. Top y legging del mismo lote de tinte.' },
-  { id: 'biker-run', sku: 'MD-BIK-04', name: 'Biker Run con bolsillo', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'biker',
-    price: 64900, colors: ['negro','azulnoche','arcilla','lavanda'], sizes: ['6','8','10','12'], tags: ['bestseller'],
+  { id: 'short-biker', sku: 'MD-BIK-02', name: 'Short biker deportivo', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'biker',
+    price: 64900, colors: ['negro','azulnoche','arcilla','lavanda'], sizes: DAMA, tags: [],
     comp: '80% poliéster reciclado, 20% elastano.', fit: 'Ajustado, largo medio muslo, bolsillo lateral para celular.' },
-  { id: 'crop-boxy', sku: 'MC-CRP-05', name: 'Camiseta crop boxy', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'crop',
-    price: 49900, colors: ['blanco','arcilla','anis','negro','lavanda'], sizes: ['6','8','10','12'], tags: ['nuevo'],
-    comp: '100% algodón peinado, 180 g/m².', fit: 'Corte recto y corto. Hombro caído.' },
-  { id: 'jogger-mujer', sku: 'MC-JOG-06', name: 'Jogger French Terry mujer', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'jogger',
-    price: 109900, colors: ['gris','toffee','oliva','negro'], sizes: ['6','8','10','12'], tags: [],
-    comp: '70% algodón, 30% poliéster. French terry 280 g/m².', fit: 'Relajado, puño en tobillo.' },
-  { id: 'oversize-mujer', sku: 'MC-OVS-07', name: 'Camiseta oversize estampada', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'oversize',
-    price: 69900, colors: ['blanco','negro','tarragon','chili'], sizes: ['6','8','10','12'], tags: ['bestseller'],
-    comp: '100% algodón, 200 g/m².', fit: 'Oversize. Recomendado pedir la talla habitual.' },
-  { id: 'tee-dryfit', sku: 'HD-TEE-08', name: 'Camiseta Dry-Fit hombre', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'tee',
-    price: 59900, colors: ['negro','gris','azulnoche','princesa','fuego'], sizes: ['S','M','L','XL','XXL'], tags: ['bestseller'],
+  { id: 'falda-short', sku: 'MD-FAL-03', name: 'Falda short deportiva', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'skirt',
+    price: 69900, colors: ['negro','blanco','lavanda','princesa','malva'], sizes: DAMA, tags: ['nuevo'],
+    comp: 'Exterior 100% poliéster; short interior 80% poliamida, 20% elastano.', fit: 'Falda con short interno, para gimnasio y tenis.' },
+  { id: 'top-core', sku: 'MD-TOP-04', name: 'Top deportivo soporte medio', cat: 'mujer-deportiva', gender: 'mujer', line: 'deportiva', garment: 'bra',
+    price: 59900, colors: ['negro','malva','lavanda','princesa','lima'], sizes: DAMA, tags: ['bestseller'],
+    comp: '80% poliamida, 20% elastano. Copas removibles.', fit: 'Ajustado. Soporte medio para entrenamiento funcional.' },
+  { id: 'conjunto-studio', sku: 'MD-SET-05', name: 'Conjunto de gimnasio top + legging', cat: 'conjuntos', gender: 'mujer', line: 'deportiva', garment: 'set',
+    price: 149900, colors: ['princesa','malva','oliva','negro','fucsia'], sizes: DAMA, tags: ['bestseller'],
+    comp: '78% poliamida, 22% elastano.', fit: 'Ajustado. Top y legging del mismo lote de tinte.' },
+  { id: 'conjunto-falda', sku: 'MD-SET-06', name: 'Conjunto top + falda short', cat: 'conjuntos', gender: 'mujer', line: 'deportiva', garment: 'setskirt',
+    price: 129900, colors: ['lavanda','negro','blanco','fucsia'], sizes: DAMA, tags: ['nuevo'],
+    comp: 'Top 80% poliamida, 20% elastano; falda con short interno.', fit: 'Top ajustado, falda con caída.' },
+
+  /* Deportiva hombre */
+  { id: 'tee-dryfit', sku: 'HD-TEE-07', name: 'Camiseta Dry-Fit hombre', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'tee',
+    price: 59900, colors: ['negro','gris','azulnoche','princesa','fuego'], sizes: CABALLERO, tags: ['bestseller'],
     comp: '100% poliéster microperforado. Secado rápido.', fit: 'Regular fit.' },
-  { id: 'pantaloneta-2en1', sku: 'HD-SHO-09', name: 'Pantaloneta 2 en 1 con licra', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'short',
-    price: 64900, colors: ['negro','azulnoche','oliva','gris'], sizes: ['S','M','L','XL','XXL'], tags: [],
+  { id: 'pantaloneta-2en1', sku: 'HD-SHO-08', name: 'Pantaloneta 2 en 1 con licra', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'short',
+    price: 64900, colors: ['negro','azulnoche','oliva','gris'], sizes: CABALLERO, tags: [],
     comp: 'Exterior 100% poliéster; interior 85% poliéster, 15% elastano.', fit: 'Regular, largo 7".' },
-  { id: 'jogger-tech', sku: 'HD-JOG-10', name: 'Jogger Tech hombre', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'jogger',
-    price: 119900, colors: ['negro','azulnoche','gris','oliva'], sizes: ['S','M','L','XL','XXL'], tags: ['nuevo'],
+  { id: 'jogger-tech', sku: 'HD-JOG-09', name: 'Jogger deportivo hombre', cat: 'hombre-deportiva', gender: 'hombre', line: 'deportiva', garment: 'jogger',
+    price: 119900, colors: ['negro','azulnoche','gris','oliva'], sizes: CABALLERO, tags: ['nuevo'],
     comp: '88% poliéster, 12% elastano. Tejido stretch liviano.', fit: 'Slim, bota con cremallera.' },
-  { id: 'polo-pique', sku: 'HC-POL-11', name: 'Polo piqué hombre', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'polo',
-    price: 79900, colors: ['blanco','azulnoche','oliva','toffee','chili'], sizes: ['S','M','L','XL','XXL'], tags: ['bestseller'],
+
+  /* Camisetas de fútbol: equipos colombianos */
+  jersey('junior', 'hombre', 89900, ['bestseller']),
+  jersey('america', 'hombre', 89900, ['bestseller']),
+  jersey('nacional', 'hombre', 89900),
+  jersey('millonarios', 'hombre', 89900),
+  jersey('santafe', 'hombre', 89900),
+  jersey('cali', 'hombre', 89900),
+  jersey('medellin', 'hombre', 89900),
+  jersey('junior', 'mujer', 84900, ['nuevo']),
+  jersey('america', 'mujer', 84900),
+  jersey('nacional', 'mujer', 84900),
+  jersey('millonarios', 'mujer', 84900),
+
+  /* Casual: camisetas, suéteres y joggers */
+  { id: 'crop-boxy', sku: 'MC-CRP-10', name: 'Camiseta crop boxy', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'crop',
+    price: 49900, colors: ['blanco','arcilla','anis','negro','lavanda'], sizes: DAMA, tags: ['nuevo'],
+    comp: '100% algodón peinado, 180 g/m².', fit: 'Corte recto y corto. Hombro caído.' },
+  { id: 'oversize-mujer', sku: 'MC-OVS-11', name: 'Camiseta oversize dama', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'oversize',
+    price: 69900, colors: ['blanco','negro','tarragon','chili'], sizes: DAMA, tags: ['bestseller'],
+    comp: '100% algodón, 200 g/m².', fit: 'Oversize. Recomendado pedir la talla habitual.' },
+  { id: 'jogger-mujer', sku: 'MC-JOG-12', name: 'Jogger French Terry dama', cat: 'mujer-casual', gender: 'mujer', line: 'casual', garment: 'jogger',
+    price: 109900, colors: ['gris','toffee','oliva','negro'], sizes: DAMA, tags: [],
+    comp: '70% algodón, 30% poliéster. French terry 280 g/m².', fit: 'Relajado, puño en tobillo.' },
+  { id: 'polo-pique', sku: 'HC-POL-13', name: 'Polo piqué hombre', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'polo',
+    price: 79900, colors: ['blanco','azulnoche','oliva','toffee','chili'], sizes: CABALLERO, tags: [],
     comp: '100% algodón piqué.', fit: 'Regular fit.' },
-  { id: 'oversize-hombre', sku: 'HC-OVS-12', name: 'Camiseta oversize heavy', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'oversize',
-    price: 69900, colors: ['negro','blanco','toffee','tarragon','gris'], sizes: ['S','M','L','XL'], tags: ['nuevo'],
+  { id: 'oversize-hombre', sku: 'HC-OVS-14', name: 'Camiseta oversize hombre', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'oversize',
+    price: 69900, colors: ['negro','blanco','toffee','tarragon','gris'], sizes: CABALLERO, tags: ['nuevo'],
     comp: '100% algodón, 240 g/m².', fit: 'Oversize, cuello grueso.' },
-  { id: 'bermuda-cargo', sku: 'HC-BER-13', name: 'Bermuda cargo gabardina', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'bermuda',
-    price: 99900, colors: ['toffee','oliva','negro','arcilla'], sizes: ['28','30','32','34','36'], tags: [],
+  { id: 'bermuda-cargo', sku: 'HC-BER-15', name: 'Bermuda cargo gabardina', cat: 'hombre-casual', gender: 'hombre', line: 'casual', garment: 'bermuda',
+    price: 99900, colors: ['toffee','oliva','negro','arcilla'], sizes: PANTALON, tags: [],
     comp: '98% algodón, 2% elastano. Gabardina lavada.', fit: 'Regular, largo sobre rodilla.' },
-  { id: 'buzo-hoodie', sku: 'UX-HOO-14', name: 'Buzo hoodie unisex', cat: 'unisex', gender: 'unisex', line: 'casual', garment: 'hoodie',
-    price: 139900, colors: ['gris','negro','azulnoche','tarragon','blanco'], sizes: ['S','M','L','XL'], tags: ['bestseller'],
-    comp: '70% algodón, 30% poliéster perchado.', fit: 'Relajado, capota doble.' },
-  { id: 'jogger-unisex', sku: 'UX-JOG-15', name: 'Jogger básico unisex', cat: 'unisex', gender: 'unisex', line: 'casual', garment: 'jogger',
-    price: 99900, colors: ['gris','negro','azulnoche'], sizes: ['S','M','L','XL'], tags: [],
-    comp: '70% algodón, 30% poliéster perchado.', fit: 'Regular, puño en tobillo.' },
-  { id: 'conjunto-lounge', sku: 'MC-SET-16', name: 'Conjunto lounge crop + jogger', cat: 'conjuntos', gender: 'mujer', line: 'casual', garment: 'set',
-    price: 139900, colors: ['arcilla','lavanda','gris','anis'], sizes: ['6','8','10','12'], tags: ['nuevo'],
-    comp: '95% algodón, 5% elastano. Rib.', fit: 'Crop ajustado, jogger relajado.' }
+  { id: 'sueter-capota', sku: 'UX-SUE-16', name: 'Suéter con capota', cat: 'unisex', gender: 'unisex', line: 'casual', garment: 'hoodie',
+    price: 139900, colors: ['gris','negro','azulnoche','tarragon','blanco'], sizes: UNISEX, tags: ['bestseller'],
+    comp: '70% algodón, 30% poliéster perchado.', fit: 'Relajado, capota doble. Tallaje unisex: la dama suele pedir una talla menos.' },
+  { id: 'sueter-cuello', sku: 'UX-SUE-17', name: 'Suéter cuello redondo', cat: 'unisex', gender: 'unisex', line: 'casual', garment: 'crew',
+    price: 119900, colors: ['gris','negro','arcilla','oliva'], sizes: UNISEX, tags: ['nuevo'],
+    comp: '70% algodón, 30% poliéster perchado.', fit: 'Regular. Tallaje unisex.' },
+  { id: 'jogger-unisex', sku: 'UX-JOG-18', name: 'Jogger básico unisex', cat: 'unisex', gender: 'unisex', line: 'casual', garment: 'jogger',
+    price: 99900, colors: ['gris','negro','azulnoche'], sizes: UNISEX, tags: [],
+    comp: '70% algodón, 30% poliéster perchado.', fit: 'Regular, puño en tobillo.' }
 ];
 
 // Stock determinístico para el prototipo: algunas combinaciones bajas o agotadas.

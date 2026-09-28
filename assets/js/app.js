@@ -54,7 +54,10 @@
     jogger: 'M63 30 L137 30 L143 72 L137 198 L141 214 L106 214 L108 198 L100 98 L92 198 L94 214 L59 214 L63 198 L57 72 Z',
     biker: 'M68 58 L132 58 L138 92 L139 158 L106 158 L100 114 L94 158 L61 158 L62 92 Z',
     short: 'M63 58 L137 58 L148 156 L106 156 L100 118 L94 156 L52 156 Z',
-    bermuda: 'M62 44 L138 44 L146 176 L106 176 L100 110 L94 176 L54 176 Z'
+    bermuda: 'M62 44 L138 44 L146 176 L106 176 L100 110 L94 176 L54 176 Z',
+    skirt: 'M66 60 L134 60 L150 150 Q100 162 50 150 Z',
+    crew: 'M58 50 L84 38 Q100 48 116 38 L142 50 L176 170 L156 176 L142 110 L142 208 L58 208 L58 110 L44 176 L24 170 Z',
+    jersey: 'M58 44 L84 30 L100 50 L116 30 L142 44 L172 76 L152 96 L142 86 L142 206 L58 206 L58 86 L48 96 L28 76 Z'
   };
   const DETAILS = {
     tee: '<path d="M86 32 Q100 50 114 32" />',
@@ -67,20 +70,41 @@
     jogger: '<path d="M58 46 L142 46" /><path d="M96 40 L96 56 M104 40 L104 56" />',
     biker: '<path d="M64 72 L136 72" /><path d="M126 96 L136 96 L136 124 L128 124" />',
     short: '<path d="M60 72 L140 72" />',
-    bermuda: '<path d="M60 58 L140 58" /><path d="M58 100 L76 100 L76 130 L56 130 M142 100 L124 100 L124 130 L144 130" />'
+    bermuda: '<path d="M60 58 L140 58" /><path d="M58 100 L76 100 L76 130 L56 130 M142 100 L124 100 L124 130 L144 130" />',
+    skirt: '<path d="M66 74 L134 74" /><path d="M84 76 L78 152 M100 76 L100 156 M116 76 L122 152" />',
+    crew: '<path d="M84 38 Q100 56 116 38" /><path d="M58 196 L142 196 M28 164 L46 170 M172 164 L154 170" />',
+    jersey: ''
   };
   function lum(hex) {
     const n = parseInt(hex.slice(1), 16);
     return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
   }
+  let svgSeq = 0;
   function garmentSVG(type, colorKey, label) {
-    const hex = (C[colorKey] || C.negro).hex;
+    const col = C[colorKey] || C.negro, hex = col.hex;
     const stroke = lum(hex) > 0.6 ? 'rgba(0,0,0,.28)' : 'rgba(255,255,255,.28)';
-    const one = (t, tf) => `<g transform="${tf || ''}"><path class="g-body" d="${SHAPES[t]}" fill="${hex}" /><g class="g-det" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round">${DETAILS[t] || ''}</g></g>`;
+    const id = 'g' + (++svgSeq);
+    let defs = '', fill = hex;
+    if (col.stripes) {
+      defs = `<defs><pattern id="${id}" width="24" height="10" patternUnits="userSpaceOnUse"><rect width="24" height="10" fill="${hex}"/><rect x="12" width="12" height="10" fill="${col.hex2}"/></pattern></defs>`;
+      fill = `url(#${id})`;
+    }
+    const one = (t, tf) => `<g transform="${tf || ''}"><path class="g-body" d="${SHAPES[t]}" fill="${fill}" /><g class="g-det" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round">${DETAILS[t] || ''}</g></g>`;
     let inner;
     if (type === 'set') inner = one('bra', 'translate(-38 8) scale(.9)') + one('legging', 'translate(52 16) scale(.86)');
+    else if (type === 'setskirt') inner = one('bra', 'translate(-30 20) scale(.9)') + one('skirt', 'translate(40 40) scale(.9)');
     else inner = one(type);
-    return `<svg viewBox="0 0 200 240" role="img" aria-label="${label || 'Prenda'}" class="garment">${inner}</svg>`;
+    // Camiseta de fútbol: cuello en V y ribetes con el color secundario, sin escudo.
+    if (type === 'jersey' && col.hex2) {
+      inner += `<g fill="none" stroke="${col.stripes ? hex : col.hex2}" stroke-width="5" stroke-linejoin="round"><path d="M84 30 L100 50 L116 30"/><path d="M28 76 L48 96 M172 76 L152 96"/></g>`;
+    }
+    return `<svg viewBox="0 0 200 240" role="img" aria-label="${label || 'Prenda'}" class="garment">${defs}${inner}</svg>`;
+  }
+  function swBg(key) {
+    const c = C[key] || C.negro;
+    if (c.stripes) return `repeating-linear-gradient(90deg, ${c.hex} 0 4px, ${c.hex2} 4px 8px)`;
+    if (c.hex2) return `linear-gradient(135deg, ${c.hex} 0 62%, ${c.hex2} 62%)`;
+    return c.hex;
   }
 
   /* ---------- Header, footer, drawer ---------- */
@@ -88,8 +112,10 @@
   const GARMENT_LABEL = {
     legging: 'Leggings', bra: 'Tops deportivos', set: 'Conjuntos', biker: 'Bikers',
     crop: 'Camisetas crop', oversize: 'Camisetas oversize', jogger: 'Joggers', tee: 'Camisetas deportivas',
-    short: 'Pantalonetas', polo: 'Polos', bermuda: 'Bermudas', hoodie: 'Buzos'
+    short: 'Pantalonetas', polo: 'Polos', bermuda: 'Bermudas', hoodie: 'Suéteres con capota',
+    skirt: 'Faldas deportivas', setskirt: 'Conjuntos con falda', crew: 'Suéteres', jersey: 'Camisetas de fútbol'
   };
+  const LINE_LABEL = { deportiva: 'Deportiva', futbol: 'Fútbol', casual: 'Casual' };
   const forGender = (p, g) => p.gender === g || p.gender === 'unisex';
   function featureCard(p, label) {
     if (!p) return '';
@@ -100,13 +126,13 @@
     </a>`;
   }
   function genderMenu(g) {
-    const cols = ['deportiva', 'casual'].map(line => {
+    const cols = ['deportiva', 'futbol', 'casual'].filter(line => P.some(p => forGender(p, g) && p.line === line)).map(line => {
       const ps = P.filter(p => forGender(p, g) && p.line === line);
       const types = [...new Set(ps.map(p => p.garment))];
       return `<div class="mega-col">
-        <a class="mega-h" href="catalogo.html?genero=${g}&linea=${line}">${line === 'deportiva' ? 'Deportiva' : 'Casual'}</a>
+        <a class="mega-h" href="catalogo.html?genero=${g}&linea=${line}">${LINE_LABEL[line]}</a>
         <ul>${types.map(t => `<li><a href="catalogo.html?genero=${g}&linea=${line}&prenda=${t}">${GARMENT_LABEL[t]}<small>${ps.filter(p => p.garment === t).length}</small></a></li>`).join('')}
-          <li><a class="mega-all" href="catalogo.html?genero=${g}&linea=${line}">Ver toda la línea ${line}</a></li></ul>
+          <li><a class="mega-all" href="catalogo.html?genero=${g}&linea=${line}">Ver todo ${LINE_LABEL[line].toLowerCase()}</a></li></ul>
       </div>`;
     }).join('');
     const quick = `<div class="mega-col">
@@ -118,6 +144,18 @@
     </div>`;
     const feat = P.find(p => p.gender === g && p.tags.includes('bestseller'));
     return cols + quick + featureCard(feat, 'Más vendido');
+  }
+  function footballMenu() {
+    const cols = [['hombre', 'Camisetas hombre'], ['mujer', 'Camisetas dama']].map(([g, t]) => {
+      const ps = P.filter(p => p.line === 'futbol' && p.gender === g);
+      return `<div class="mega-col">
+        <a class="mega-h" href="catalogo.html?linea=futbol&genero=${g}">${t}</a>
+        <ul>${ps.map(p => `<li><a href="producto.html?id=${p.id}"><span><i class="sw" style="background:${swBg(p.colors[0])}"></i>${window.TEAMS[p.team]}</span></a></li>`).join('')}
+          <li><a class="mega-all" href="catalogo.html?linea=futbol&genero=${g}">Ver todas</a></li></ul>
+      </div>`;
+    }).join('');
+    const feats = P.filter(p => p.line === 'futbol' && p.tags.includes('bestseller'));
+    return cols + feats.map(p => featureCard(p, 'Más vendida')).join('');
   }
   function tagMenu(tag, label) {
     const cols = ['mujer', 'hombre'].map(g => {
@@ -150,6 +188,7 @@
   const NAV = [
     { href: 'catalogo.html?genero=mujer', label: 'Mujer', menu: () => genderMenu('mujer') },
     { href: 'catalogo.html?genero=hombre', label: 'Hombre', menu: () => genderMenu('hombre') },
+    { href: 'catalogo.html?linea=futbol', label: 'Fútbol', menu: footballMenu },
     { href: 'catalogo.html?tag=nuevo', label: 'Novedades', menu: () => tagMenu('nuevo', 'Nuevo') },
     { href: 'catalogo.html?tag=bestseller', label: 'Más vendidos', menu: () => tagMenu('bestseller', 'Más vendido') },
     { href: 'mayoristas.html', label: 'Comprar por mayor', menu: b2bMenu, cls: 'nav-b2b' }
@@ -231,8 +270,8 @@
       const q = norm(input.value.trim());
       if (q.length < 2) { box.hidden = true; return; }
       const hits = P.filter(p => norm(p.name + ' ' + p.sku + ' ' + p.colors.map(c => C[c].name).join(' ') + ' ' + p.cat).includes(q)).slice(0, 5);
-      const colorHit = Object.entries(C).find(([, v]) => norm(v.name).includes(q));
-      box.innerHTML = (colorHit ? `<a href="catalogo.html?color=${colorHit[0]}" class="sg-color"><i style="background:${colorHit[1].hex}"></i>Ver todo en ${colorHit[1].name}</a>` : '') +
+      const colorHit = Object.entries(C).find(([, v]) => v.role !== 'equipo' && norm(v.name).includes(q));
+      box.innerHTML = (colorHit ? `<a href="catalogo.html?color=${colorHit[0]}" class="sg-color"><i style="background:${swBg(colorHit[0])}"></i>Ver todo en ${colorHit[1].name}</a>` : '') +
         (hits.length ? hits.map(p => `<a href="producto.html?id=${p.id}"><span>${p.name}</span><code>${p.sku}</code></a>`).join('')
                      : `<p>Sin resultados para “${input.value}”. Prueba con “legging”, “oversize” o un color.</p>`);
       box.hidden = false;
@@ -247,7 +286,7 @@
       <div class="wrap foot">
         <div>
           <a href="index.html" class="logo">MARCA<span>®</span></a>
-          <p class="muted">Ropa deportiva y casual para hombre y mujer. Venta al por mayor y al detal con envío a toda Colombia.</p>
+          <p class="muted">Ropa deportiva, conjuntos de gimnasio, camisetas de fútbol y ropa casual para hombre y mujer. Venta al por mayor y al detal con envío a toda Colombia.</p>
           <p class="muted small">[DATO REQUERIDO] Razón social · NIT · Dirección de bodega · Horario de atención</p>
         </div>
         <div><h4>Comprar</h4><a href="catalogo.html?genero=mujer">Mujer</a><a href="catalogo.html?genero=hombre">Hombre</a><a href="catalogo.html?tag=nuevo">Novedades</a><a href="catalogo.html?tag=bestseller">Más vendidos</a></div>
@@ -332,7 +371,7 @@
         <div class="line-body">
           <div class="line-top"><a href="producto.html?id=${id}">${p.name}</a><b>${cop(unitPrice(p) * units)}</b></div>
           <code class="muted">${p.sku} · ${units} u. × ${cop(unitPrice(p))}</code>
-          <ul class="line-vars">${lines.map(l => `<li><i class="sw" style="background:${C[l.color].hex}"></i>${C[l.color].name} · ${l.size}
+          <ul class="line-vars">${lines.map(l => `<li><i class="sw" style="background:${swBg(l.color)}"></i>${C[l.color].name} · ${l.size}
             <span class="qty sm"><button data-dec="${l.idx}" aria-label="Restar">−</button><output>${l.qty}</output><button data-inc="${l.idx}" aria-label="Sumar">+</button></span></li>`).join('')}</ul>
         </div>
       </div>`;
@@ -411,10 +450,10 @@
         <div class="g-main">${garmentSVG(p.garment, p.colors[0], p.name)}</div>
       </a>
       <div class="card-body">
-        <ul class="swatches" aria-label="Colores">${p.colors.map((c, i) => `<li><button class="sw ${i === 0 ? 'on' : ''}" data-c="${c}" style="background:${C[c].hex}" aria-label="${C[c].name}" title="${C[c].name}"></button></li>`).join('')}</ul>
+        <ul class="swatches" aria-label="Colores">${p.colors.map((c, i) => `<li><button class="sw ${i === 0 ? 'on' : ''}" data-c="${c}" style="background:${swBg(c)}" aria-label="${C[c].name}" title="${C[c].name}"></button></li>`).join('')}</ul>
         <a href="producto.html?id=${p.id}" class="card-name">${p.name}</a>
         <div class="card-price">${priceBlock(p)}</div>
-        <p class="card-meta muted small">Tallas ${p.sizes[0]}–${p.sizes[p.sizes.length - 1]} · ${p.colors.length} colores</p>
+        <p class="card-meta muted small">Tallas ${p.sizes[0]}–${p.sizes[p.sizes.length - 1]} · ${p.team ? 'Local y visitante' : p.colors.length + ' colores'}</p>
       </div>
     </article>`;
   }
@@ -432,17 +471,24 @@
     });
   }
 
+  // Mismo criterio que el catálogo para contar referencias de un enlace.
+  function matchesQuery(p, q) {
+    const g = q.get('genero'), l = q.get('linea'), c = q.get('cat'), t = q.get('prenda');
+    return (!g || p.gender === g || p.gender === 'unisex') && (!l || p.line === l) &&
+      (!c || p.cat === c) && (!t || p.garment === t);
+  }
+
   /* ---------- Página: inicio ---------- */
   function initHome() {
     const hero = $('#hero-garments');
     if (hero) {
-      const seq = [['legging', 'princesa'], ['hoodie', 'gris'], ['bra', 'malva'], ['polo', 'oliva'], ['oversize', 'arcilla'], ['jogger', 'azulnoche']];
+      const seq = [['legging', 'princesa'], ['jersey', 'junior-l'], ['skirt', 'lavanda'], ['hoodie', 'gris'], ['bra', 'malva'], ['jersey', 'america-l'], ['oversize', 'arcilla']];
       let k = 0;
       const draw = () => {
         const [g, c] = seq[k % seq.length];
         hero.innerHTML = garmentSVG(g, c, 'Prenda destacada') ;
         const lab = $('#hero-color');
-        if (lab) lab.innerHTML = `<i style="background:${C[c].hex}"></i>${C[c].name} <span class="muted">· ${C[c].pantone}</span>`;
+        if (lab) lab.innerHTML = `<i style="background:${swBg(c)}"></i>${C[c].name} <span class="muted">· ${C[c].pantone}</span>`;
         k++;
       };
       draw();
@@ -452,9 +498,9 @@
       }, 2600);
     }
     const cats = $('#cats');
-    if (cats) cats.innerHTML = window.CATEGORIES.map(c => {
-      const n = P.filter(p => p.cat === c.id || (c.id === 'unisex' && p.gender === 'unisex')).length;
-      return `<a class="cat" href="catalogo.html?cat=${c.id}"><div class="cat-img">${garmentSVG(c.garment, c.color, c.name)}</div><span>${c.name}</span><small class="muted">${n} referencias</small></a>`;
+    if (cats) cats.innerHTML = window.CATEGORIES.filter(c => c.tile).map(c => {
+      const n = P.filter(p => matchesQuery(p, new URLSearchParams(c.href.split('?')[1]))).length;
+      return `<a class="cat" href="${c.href}"><div class="cat-img">${garmentSVG(c.garment, c.color, c.name)}</div><span>${c.name}</span><small class="muted">${n} referencias</small></a>`;
     }).join('');
     const best = $('#best');
     const renderBest = () => { if (best) { best.innerHTML = P.filter(p => p.tags.includes('bestseller')).slice(0, 8).map(card).join(''); bindCards(best); } };
@@ -494,7 +540,7 @@
       ['Diciembre', 'Estreno y vacaciones', ['chili', 'blanco', 'anis', 'lavanda'], 'Rojo para Navidad, blanco y amarillo para Año Nuevo.']
     ];
     el.innerHTML = months.map(([m, s, cs, d]) => `<a class="season" href="catalogo.html?color=${cs[0]}">
-      <div class="season-sw">${cs.map(c => `<i style="background:${C[c].hex}" title="${C[c].name}"></i>`).join('')}</div>
+      <div class="season-sw">${cs.map(c => `<i style="background:${swBg(c)}" title="${C[c].name}"></i>`).join('')}</div>
       <h3>${m}</h3><p class="eyebrow">${s}</p><p class="muted small">${d}</p>
       <p class="small">${cs.map(c => C[c].name).join(' · ')}</p></a>`).join('');
   }
@@ -506,7 +552,7 @@
     const q = new URLSearchParams(location.search);
     const f = {
       genero: q.get('genero') ? [q.get('genero')] : [],
-      linea: q.get('linea') ? [q.get('linea')] : [], prenda: q.get('prenda') || '',
+      linea: q.get('linea') ? [q.get('linea')] : [], prenda: q.get('prenda') || '', equipo: q.get('equipo') ? [q.get('equipo')] : [],
       tallas: [], colores: q.get('color') ? [q.get('color')] : [],
       cat: q.get('cat') || '', tag: q.get('tag') || '', q: (q.get('q') || '').toLowerCase(),
       stock: false, sort: 'rel', view: q.get('vista') === 'lista' ? 'lista' : 'grid'
@@ -519,17 +565,21 @@
       { label: 'Hombre', sizes: ['S', 'M', 'L', 'XL', 'XXL'] },
       { label: 'Pantalón hombre', sizes: ['28', '30', '32', '34', '36'] }
     ];
-    const usedColors = Object.keys(C).filter(k => P.some(p => p.colors.includes(k)));
+    const usedColors = Object.keys(C).filter(k => C[k].role !== 'equipo' && P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
       <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
-      <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
+      <fieldset><legend>Línea</legend>${['deportiva', 'futbol', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${LINE_LABEL[g]}</label>`).join('')}</fieldset>
+      <fieldset><legend>Equipo</legend>${Object.entries(window.TEAMS).map(([k, t]) => `<label class="chk"><input type="checkbox" name="equipo" value="${k}" ${f.equipo.includes(k) ? 'checked' : ''}/> <i class="sw" style="background:${swBg(k + '-l')}"></i>${t}</label>`).join('')}</fieldset>
       <fieldset id="size-filter"><legend>Talla</legend><div id="size-filter-body"></div></fieldset>
-      <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${C[c].hex}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
+      <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${swBg(c)}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
 
     let sizeKey = '';
     function renderSizeFilter() {
-      const scope = P.filter(p => !f.genero.length || f.genero.includes(p.gender));
+      // Tallas de las prendas que se están viendo. En Mujer u Hombre no se suman las unisex (S–XL).
+      const scope = P.filter(p => (!f.genero.length || f.genero.includes(p.gender)) &&
+        (!f.linea.length || f.linea.includes(p.line)) && (!f.prenda || p.garment === f.prenda) &&
+        (!f.equipo.length || f.equipo.includes(p.team)) && (!f.cat || p.cat === f.cat) && (!f.tag || p.tags.includes(f.tag)));
       const groups = sizeGroups
         .map(g => ({ label: g.label, sizes: g.sizes.filter(sz => scope.some(p => p.sizes.includes(sz))) }))
         .filter(g => g.sizes.length);
@@ -555,7 +605,7 @@
     $('#open-filters').addEventListener('click', () => document.body.classList.add('filters-open'));
     $$('[data-close-filters]').forEach(b => b.addEventListener('click', () => document.body.classList.remove('filters-open')));
     $('#clear-filters').addEventListener('click', () => {
-      Object.assign(f, { genero: [], linea: [], prenda: '', tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
+      Object.assign(f, { genero: [], linea: [], prenda: '', equipo: [], tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
       $$('#filters-body input').forEach(i => { i.checked = false; });
       $('#q').value = '';
       render();
@@ -566,6 +616,7 @@
         (!f.genero.length || f.genero.includes(p.gender) || (p.gender === 'unisex' && f.genero.some(g => g !== 'unisex'))) &&
         (!f.linea.length || f.linea.includes(p.line)) &&
         (!f.prenda || p.garment === f.prenda) &&
+        (!f.equipo.length || f.equipo.includes(p.team)) &&
         (!f.tallas.length || p.sizes.some(s => f.tallas.includes(s))) &&
         (!f.colores.length || p.colors.some(c => f.colores.includes(c))) &&
         (!f.cat || p.cat === f.cat || (f.cat === 'unisex' && p.gender === 'unisex')) &&
@@ -581,7 +632,8 @@
     function chips() {
       const c = [];
       f.genero.forEach(v => c.push(['genero', v, v]));
-      f.linea.forEach(v => c.push(['linea', v, v]));
+      f.linea.forEach(v => c.push(['linea', v, LINE_LABEL[v]]));
+      f.equipo.forEach(v => c.push(['equipo', v, window.TEAMS[v]]));
       f.tallas.forEach(v => c.push(['tallas', v, 'Talla ' + v]));
       f.colores.forEach(v => c.push(['colores', v, C[v].name]));
       if (f.prenda) c.push(['prenda', f.prenda, GARMENT_LABEL[f.prenda] || f.prenda]);
@@ -601,7 +653,7 @@
     function render() {
       const r = list();
       const g1 = f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : '';
-      const title = f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
+      const title = f.equipo.length === 1 ? 'Camisetas ' + window.TEAMS[f.equipo[0]] : f.linea.length === 1 && f.linea[0] === 'futbol' && !f.prenda ? 'Camisetas de fútbol' + (g1 ? ' · ' + g1 : '') : f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
       $('#cat-title').textContent = title;
       renderSizeFilter();
       $$('.view-toggle button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === f.view));
@@ -619,7 +671,7 @@
         <section class="quick-item">
           <header><a href="producto.html?id=${p.id}"><b>${p.name}</b></a><code class="muted">${p.sku}</code><span class="price b2b">${cop(unitPrice(p))} c/u</span></header>
           <div class="matrix-wrap"><table class="matrix"><thead><tr><th scope="col">Color</th>${p.sizes.map(s => `<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>
-          ${p.colors.map(c => `<tr><th scope="row"><i class="sw" style="background:${C[c].hex}"></i>${C[c].name}</th>${p.sizes.map(s => {
+          ${p.colors.map(c => `<tr><th scope="row"><i class="sw" style="background:${swBg(c)}"></i>${C[c].name}</th>${p.sizes.map(s => {
             const st = window.stockFor(p.id, c, s);
             return `<td>${st ? `<input type="number" min="0" max="${st}" inputmode="numeric" value="${qtyInCart(p.id, c, s) || ''}" placeholder="0" data-p="${p.id}" data-c="${c}" data-s="${s}" aria-label="${p.name} ${C[c].name} talla ${s}" />${st < 10 ? `<small class="low">Quedan ${st}</small>` : ''}` : '<small class="out">Agotado</small>'}</td>`;
           }).join('')}</tr>`).join('')}
@@ -654,12 +706,12 @@
           <p class="small muted">Prototipo: aquí van 5–7 fotos reales por color (frente, espalda, detalle de tela, modelo en movimiento) y un video corto.</p>
         </div>
         <div class="buy">
-          <p class="eyebrow">${p.line === 'deportiva' ? 'Línea deportiva' : 'Línea casual'} · ${p.gender}</p>
+          <p class="eyebrow">Línea ${LINE_LABEL[p.line].toLowerCase()} · ${p.gender === 'mujer' ? 'dama' : p.gender === 'hombre' ? 'caballero' : 'unisex'}${p.team ? ' · ' + window.TEAMS[p.team] : ''}</p>
           <h1>${p.name}</h1>
           <code class="muted">SKU ${p.sku}</code>
           <div id="price-area"></div>
           <div class="field"><span class="label">Color: <b id="color-name">${C[color].name}</b></span>
-            <div class="swatches lg">${p.colors.map(c => `<button class="sw ${c === color ? 'on' : ''}" data-c="${c}" style="background:${C[c].hex}" aria-label="${C[c].name}" title="${C[c].name}"></button>`).join('')}</div>
+            <div class="swatches lg">${p.colors.map(c => `<button class="sw ${c === color ? 'on' : ''}" data-c="${c}" style="background:${swBg(c)}" aria-label="${C[c].name}" title="${C[c].name}"></button>`).join('')}</div>
           </div>
           <div id="buy-area"></div>
           <ul class="assure small">
@@ -738,7 +790,7 @@
         ba.innerHTML = `
           <div class="field"><span class="label">Cantidades por color y talla</span>
             <div class="matrix-wrap"><table class="matrix"><thead><tr><th scope="col">Color</th>${p.sizes.map(s => `<th scope="col">${s}</th>`).join('')}<th scope="col">Total</th></tr></thead><tbody>
-            ${p.colors.map(c => `<tr data-row="${c}"><th scope="row"><i class="sw" style="background:${C[c].hex}"></i>${C[c].name}</th>${p.sizes.map(s => {
+            ${p.colors.map(c => `<tr data-row="${c}"><th scope="row"><i class="sw" style="background:${swBg(c)}"></i>${C[c].name}</th>${p.sizes.map(s => {
               const st = window.stockFor(p.id, c, s);
               return `<td>${st ? `<input type="number" min="0" max="${st}" inputmode="numeric" placeholder="0" value="${qtyInCart(p.id, c, s) || ''}" data-c="${c}" data-s="${s}" aria-label="${C[c].name} talla ${s}" />${st < 10 ? `<small class="low">Quedan ${st}</small>` : ''}` : '<small class="out">Agotado</small>'}</td>`;
             }).join('')}<td class="rt" data-rt="${c}">0</td></tr>`).join('')}
@@ -820,7 +872,7 @@
       const w = isWholesale();
       const ship = w ? (cartUnits() >= B.wholesaleFreeShippingUnits ? 0 : 25000) : (t.total >= B.retailFreeShipping ? 0 : 14900);
       $('#co-summary').innerHTML = state.cart.length ? `
-        <ul class="co-lines">${state.cart.map(i => { const p = byId(i.id); return `<li><i class="sw" style="background:${C[i.color].hex}"></i><span>${p.name}<br><small class="muted">${C[i.color].name} · ${i.size} · ${i.qty} u.</small></span><b>${cop(unitPrice(p) * i.qty)}</b></li>`; }).join('')}</ul>
+        <ul class="co-lines">${state.cart.map(i => { const p = byId(i.id); return `<li><i class="sw" style="background:${swBg(i.color)}"></i><span>${p.name}<br><small class="muted">${C[i.color].name} · ${i.size} · ${i.qty} u.</small></span><b>${cop(unitPrice(p) * i.qty)}</b></li>`; }).join('')}</ul>
         <dl class="totals">
           <div><dt>Piezas</dt><dd>${cartUnits()}</dd></div>
           <div><dt>Precio</dt><dd>${tier ? tier.name : 'Detal'}</dd></div>

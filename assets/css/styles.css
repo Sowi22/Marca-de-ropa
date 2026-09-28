@@ -472,6 +472,9 @@ fieldset > *:not(legend) { clear: both; }
 .card-price small { font-weight: 500; font-size: .74rem; }
 .card-price .price.b2b { font-size: .95rem; }
 
-/* Rótulos del filtro de tallas (dama / caballero / pantalón) */
+/* Tallas agrupadas (dama / caballero / pantalón) y equipos */
 .size-group { margin: 10px 0 6px; font-size: .78rem; color: var(--ink-2); font-weight: 600; }
 .size-group:first-of-type { margin-top: 0; }
+.chk .sw { width: 14px; height: 14px; }
+.mega li a span { display: inline-flex; align-items: center; gap: 8px; }
+.mega li .sw { width: 14px; height: 14px; }
