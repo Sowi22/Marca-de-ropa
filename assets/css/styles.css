@@ -586,7 +586,6 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 .collection-copy li:last-child { border-bottom: 1px solid rgba(255, 255, 255, .3); }
 .c-mujer { background: #8E5566; }   /* malva profundo, familia Foxglove */
 .c-hombre { background: #4A4731; }  /* oliva, familia Burnt Olive */
-.c-futbol { background: #9B1B30; }  /* Chili Pepper 19-1557 */
 @media (max-width: 800px) {
   .collection { grid-template-columns: 1fr; min-height: 0; }
   .collection.reverse .collection-art { order: 0; }

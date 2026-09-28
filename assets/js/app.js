@@ -115,7 +115,7 @@
     short: 'Pantalonetas', polo: 'Polos', bermuda: 'Bermudas', hoodie: 'Suéteres con capota',
     skirt: 'Faldas deportivas', setskirt: 'Conjuntos con falda', crew: 'Suéteres', jersey: 'Camisetas de fútbol'
   };
-  const LINE_LABEL = { deportiva: 'Deportiva', futbol: 'Fútbol', casual: 'Casual' };
+  const LINE_LABEL = { deportiva: 'Deportiva', casual: 'Casual' };
   const forGender = (p, g) => p.gender === g || p.gender === 'unisex';
   function featureCard(p, label) {
     if (!p) return '';
@@ -126,7 +126,7 @@
     </a>`;
   }
   function genderMenu(g) {
-    const cols = ['deportiva', 'futbol', 'casual'].filter(line => P.some(p => forGender(p, g) && p.line === line)).map(line => {
+    const cols = ['deportiva', 'casual'].filter(line => P.some(p => forGender(p, g) && p.line === line)).map(line => {
       const ps = P.filter(p => forGender(p, g) && p.line === line);
       const types = [...new Set(ps.map(p => p.garment))];
       return `<div class="mega-col">
@@ -144,18 +144,6 @@
     </div>`;
     const feat = P.find(p => p.gender === g && p.tags.includes('bestseller'));
     return cols + quick + featureCard(feat, 'Más vendido');
-  }
-  function footballMenu() {
-    const cols = [['hombre', 'Camisetas hombre'], ['mujer', 'Camisetas dama']].map(([g, t]) => {
-      const ps = P.filter(p => p.line === 'futbol' && p.gender === g);
-      return `<div class="mega-col">
-        <a class="mega-h" href="catalogo.html?linea=futbol&genero=${g}">${t}</a>
-        <ul>${ps.map(p => `<li><a href="producto.html?id=${p.id}"><span><i class="sw" style="background:${swBg(p.colors[0])}"></i>${window.TEAMS[p.team]}</span></a></li>`).join('')}
-          <li><a class="mega-all" href="catalogo.html?linea=futbol&genero=${g}">Ver todas</a></li></ul>
-      </div>`;
-    }).join('');
-    const feats = P.filter(p => p.line === 'futbol' && p.tags.includes('bestseller'));
-    return cols + feats.map(p => featureCard(p, 'Más vendida')).join('');
   }
   function tagMenu(tag, label) {
     const cols = ['mujer', 'hombre'].map(g => {
@@ -188,7 +176,6 @@
   const NAV = [
     { href: 'catalogo.html?genero=mujer', label: 'Mujer', menu: () => genderMenu('mujer') },
     { href: 'catalogo.html?genero=hombre', label: 'Hombre', menu: () => genderMenu('hombre') },
-    { href: 'catalogo.html?linea=futbol', label: 'Fútbol', menu: footballMenu },
     { href: 'catalogo.html?tag=nuevo', label: 'Novedades', menu: () => tagMenu('nuevo', 'Nuevo') },
     { href: 'catalogo.html?tag=bestseller', label: 'Más vendidos', menu: () => tagMenu('bestseller', 'Más vendido') },
     { href: 'mayoristas.html', label: 'Comprar por mayor', menu: b2bMenu, cls: 'nav-b2b' }
@@ -583,8 +570,8 @@
     const usedColors = Object.keys(C).filter(k => C[k].role !== 'equipo' && P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
       <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
-      <fieldset><legend>Línea</legend>${['deportiva', 'futbol', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${LINE_LABEL[g]}</label>`).join('')}</fieldset>
-      <fieldset><legend>Equipo</legend>${Object.entries(window.TEAMS).map(([k, t]) => `<label class="chk"><input type="checkbox" name="equipo" value="${k}" ${f.equipo.includes(k) ? 'checked' : ''}/> <i class="sw" style="background:${swBg(k + '-l')}"></i>${t}</label>`).join('')}</fieldset>
+      <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${LINE_LABEL[g]}</label>`).join('')}</fieldset>
+      <fieldset id="team-filter"><legend>Equipo de fútbol</legend>${Object.entries(window.TEAMS).map(([k, t]) => `<label class="chk"><input type="checkbox" name="equipo" value="${k}" ${f.equipo.includes(k) ? 'checked' : ''}/> <i class="sw" style="background:${swBg(k + '-l')}"></i>${t}</label>`).join('')}</fieldset>
       <fieldset id="size-filter"><legend>Talla</legend><div id="size-filter-body"></div></fieldset>
       <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${swBg(c)}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
@@ -598,6 +585,7 @@
       const groups = sizeGroups
         .map(g => ({ label: g.label, sizes: g.sizes.filter(sz => scope.some(p => p.sizes.includes(sz))) }))
         .filter(g => g.sizes.length);
+      $('#team-filter').hidden = !scope.some(p => p.team);
       const key = groups.map(g => g.label + g.sizes.join()).join('|');
       if (key === sizeKey) return;
       sizeKey = key;
@@ -668,7 +656,7 @@
     function render() {
       const r = list();
       const g1 = f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : '';
-      const title = f.equipo.length === 1 ? 'Camisetas ' + window.TEAMS[f.equipo[0]] : f.linea.length === 1 && f.linea[0] === 'futbol' && !f.prenda ? 'Camisetas de fútbol' + (g1 ? ' · ' + g1 : '') : f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
+      const title = f.equipo.length === 1 ? 'Camisetas ' + window.TEAMS[f.equipo[0]] : f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
       $('#cat-title').textContent = title;
       renderSizeFilter();
       $$('.view-toggle button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === f.view));

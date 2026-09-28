@@ -67,7 +67,6 @@ const PANTALON = ['28', '30', '32', '34', '36'];
 window.CATEGORIES = [
   { id: 'mujer-deportiva',  name: 'Deportiva mujer',       href: 'catalogo.html?genero=mujer&linea=deportiva',  garment: 'set',      color: 'malva',     tile: true },
   { id: 'hombre-deportiva', name: 'Deportiva hombre',      href: 'catalogo.html?genero=hombre&linea=deportiva', garment: 'tee',      color: 'azulnoche', tile: true },
-  { id: 'futbol',           name: 'Camisetas de fútbol',   href: 'catalogo.html?linea=futbol',                  garment: 'jersey',   color: 'junior-l',  tile: true },
   { id: 'conjuntos',        name: 'Conjuntos de gimnasio', href: 'catalogo.html?cat=conjuntos',                 garment: 'setskirt', color: 'princesa',  tile: true },
   { id: 'mujer-casual',     name: 'Casual mujer',          href: 'catalogo.html?genero=mujer&linea=casual',     garment: 'crop',     color: 'arcilla',   tile: true },
   { id: 'hombre-casual',    name: 'Casual hombre',         href: 'catalogo.html?genero=hombre&linea=casual',    garment: 'polo',     color: 'oliva',     tile: true },
@@ -78,7 +77,7 @@ const jersey = (team, gender, price, tags) => ({
   id: 'futbol-' + team + (gender === 'mujer' ? '-dama' : ''),
   sku: 'FB-' + team.slice(0, 3).toUpperCase() + (gender === 'mujer' ? '-D' : '-H'),
   name: 'Camiseta ' + window.TEAMS[team] + (gender === 'mujer' ? ' dama' : ''),
-  cat: 'futbol', gender, line: 'futbol', garment: 'jersey', team,
+  cat: gender + '-deportiva', gender, line: 'deportiva', garment: 'jersey', team,
   price, colors: [team + '-l', team + '-v'], sizes: gender === 'mujer' ? DAMA : CABALLERO, tags: tags || [],
   comp: 'Poliéster de secado rápido. [VALIDAR ficha técnica y licencia del club]',
   fit: gender === 'mujer' ? 'Corte dama, entallado.' : 'Corte regular.'
