@@ -135,7 +135,7 @@
       const types = [...new Set(ps.map(p => p.garment))];
       return `<div class="mega-col">
         <a class="mega-h" href="catalogo.html?genero=${g}&linea=${line}">${LINE_LABEL[line]}</a>
-        <ul>${types.map(t => `<li><a href="catalogo.html?genero=${g}&linea=${line}&prenda=${t}">${GARMENT_LABEL[t]}<small>${ps.filter(p => p.garment === t).length}</small></a></li>`).join('')}
+        <ul>${types.map(t => `<li><a href="catalogo.html?genero=${g}&linea=${line}&prenda=${t}">${GARMENT_LABEL[t]}</a></li>`).join('')}
           <li><a class="mega-all" href="catalogo.html?genero=${g}&linea=${line}">Ver todo ${LINE_LABEL[line].toLowerCase()}</a></li></ul>
       </div>`;
     }).join('');
@@ -335,18 +335,84 @@
   }
 
   const pz = n => n + (n === 1 ? ' pieza' : ' piezas');
-  function tierMeter(compact) {
-    const u = cartUnits(), cur = currentTier(), nxt = nextTier();
-    const goal = nxt ? nxt.min : T[T.length - 1].min;
-    const pct = Math.min(100, u / goal * 100);
+  function tierMeter(compact, units) {
+    const u = units == null ? cartUnits() : units, cur = tierFor(u), nxt = T.find(x => u < x.min);
+    const goal = T[T.length - 1].min;
     let msg;
-    if (!cur) msg = `Llevas <b>${pz(u)}</b>. Agrega <b>${pz(T[0].min - u)}</b> más (de cualquier prenda) y todo el pedido pasa a <b>precio por mayor</b> (−${T[0].off * 100}%).`;
-    else if (nxt) msg = `<b>Precio ${cur.name}</b> activo con ${pz(u)} (−${cur.off * 100}%). Suma <b>${pz(nxt.min - u)}</b> y pasas a ${nxt.name} (−${nxt.off * 100}%).`;
-    else msg = `<b>Precio ${cur.name}</b> activo con ${pz(u)}: tienes el mejor precio (−${cur.off * 100}%).`;
+    if (!u) msg = `Desde <b>${T[0].min} piezas</b> en tu pedido pagas precio por mayor. Puedes mezclar prendas, tallas y colores.`;
+    else if (!cur) msg = `Llevas <b>${u} de ${T[0].min} piezas</b> para el precio por mayor. Te faltan <b>${T[0].min - u}</b>.`;
+    else if (nxt) msg = `Ya tienes <b>precio por mayor (−${cur.off * 100}%)</b>. Con <b>${nxt.min - u} piezas más</b> todo baja a −${nxt.off * 100}%.`;
+    else msg = `Tienes el <b>mejor precio (−${cur.off * 100}%)</b>.`;
     return `<div class="meter ${compact ? 'compact' : ''}">
       <p>${msg}</p>
-      <div class="track" aria-hidden="true"><span style="width:${pct}%"></span>${T.map(t => `<i style="left:${Math.min(100, t.min / goal * 100)}%"></i>`).join('')}</div>
+      <div class="track" aria-hidden="true"><span style="width:${Math.min(100, u / goal * 100)}%"></span>${T.map(t => `<i style="left:${t.min / goal * 100}%"></i>`).join('')}</div>
+      <div class="track-labels" aria-hidden="true">${T.map(t => `<span class="${u >= t.min ? 'ok' : ''}" style="left:${t.min / goal * 100}%">${t.min} pzs · −${t.off * 100}%</span>`).join('')}</div>
     </div>`;
+  }
+
+  // Compra por mayor paso a paso: 1) color, 2) cantidad por talla, 3) agregar al pedido.
+  // Las cantidades se preparan aquí y solo pasan al pedido al tocar el botón.
+  function wholesalePicker(p, root, opts) {
+    opts = opts || {};
+    const key = (c, sz) => c + '|' + sz;
+    const draft = new Map();
+    const load = () => { draft.clear(); p.colors.forEach(c => p.sizes.forEach(sz => { const q = qtyInCart(p.id, c, sz); if (q) draft.set(key(c, sz), q); })); };
+    load();
+    let sel = opts.color || p.colors.find(c => p.sizes.some(sz => draft.get(key(c, sz)))) || p.colors[0];
+    const qOf = (c, sz) => draft.get(key(c, sz)) || 0;
+    const colorUnits = c => p.sizes.reduce((a, sz) => a + qOf(c, sz), 0);
+    const draftUnits = () => p.colors.reduce((a, c) => a + colorUnits(c), 0);
+    const cartOfProduct = () => state.cart.filter(i => i.id === p.id).reduce((a, i) => a + i.qty, 0);
+    const setQ = (c, sz, v) => { const st = window.stockFor(p.id, c, sz); v = Math.max(0, Math.min(st, v)); if (v) draft.set(key(c, sz), v); else draft.delete(key(c, sz)); };
+
+    function draw(focus) {
+      const n = draftUnits(), inCart = cartOfProduct();
+      const orderUnits = cartUnits() - inCart + n;            // cómo quedaría el pedido completo
+      const t = tierFor(orderUnits), price = t ? wholesale(p, t.off) : p.price;
+      const chosen = p.colors.filter(c => colorUnits(c));
+      const changed = p.colors.some(c => p.sizes.some(sz => qOf(c, sz) !== qtyInCart(p.id, c, sz)));
+      root.innerHTML = `
+        <div class="wp">
+          <p class="wp-step"><span class="wp-n">1</span>Elige el color</p>
+          <div class="wp-colors">${p.colors.map(c => `<button type="button" class="wp-color ${c === sel ? 'on' : ''}" data-c="${c}" aria-pressed="${c === sel}">
+            <i class="sw" style="background:${swBg(c)}"></i><span>${C[c].name}</span>${colorUnits(c) ? `<b class="wp-badge">${colorUnits(c)}</b>` : ''}</button>`).join('')}</div>
+
+          <p class="wp-step"><span class="wp-n">2</span>¿Cuántas quieres de cada talla? <span class="muted">(${C[sel].name})</span></p>
+          <div class="wp-sizes">${p.sizes.map(sz => {
+            const st = window.stockFor(p.id, sel, sz), q = qOf(sel, sz);
+            if (!st) return `<div class="wp-size out"><span class="wp-s">${sz}</span><small>Agotado</small></div>`;
+            return `<div class="wp-size ${q ? 'has' : ''}"><span class="wp-s">${sz}</span>
+              <div class="stepper"><button type="button" data-s="${sz}" data-d="-1" aria-label="Quitar una talla ${sz}" ${q ? '' : 'disabled'}>−</button><input type="number" inputmode="numeric" min="0" max="${st}" value="${q}" data-s="${sz}" aria-label="Cantidad talla ${sz}" /><button type="button" data-s="${sz}" data-d="1" aria-label="Sumar una talla ${sz}" ${q >= st ? 'disabled' : ''}>+</button></div>
+              <small>${st < 10 ? `Últimas ${st}` : '&nbsp;'}</small></div>`;
+          }).join('')}</div>
+          <button type="button" class="link wp-curve">+ 1 de cada talla en ${C[sel].name}</button>
+
+          <p class="wp-step"><span class="wp-n">3</span>Revisa y agrega</p>
+          <div class="wp-summary">${chosen.length ? chosen.map(c => `<div class="wp-line"><span><i class="sw" style="background:${swBg(c)}"></i><b>${C[c].name}</b> · ${p.sizes.filter(sz => qOf(c, sz)).map(sz => `talla ${sz}: ${qOf(c, sz)}`).join(', ')}</span><button type="button" class="link wp-clear" data-c="${c}">Quitar</button></div>`).join('')
+            : '<p class="muted small">Todavía no has elegido tallas.</p>'}</div>
+          <div class="wp-total"><span>${pz(n)} × ${cop(price)}</span><b>${cop(n * price)}</b></div>
+          <button type="button" class="btn btn-b2b block wp-add" ${changed ? '' : 'disabled'}>${!changed && inCart ? '✓ Ya está en tu pedido' : inCart ? `Actualizar pedido (${pz(n)})` : n ? `Agregar ${pz(n)} al pedido` : 'Elige tallas para agregar'}</button>
+          ${tierMeter(false, orderUnits)}
+        </div>`;
+
+      $$('.wp-color', root).forEach(b => b.addEventListener('click', () => { sel = b.dataset.c; if (opts.onColor) opts.onColor(sel); draw(); }));
+      $$('.stepper button', root).forEach(b => b.addEventListener('click', () => { setQ(sel, b.dataset.s, qOf(sel, b.dataset.s) + (+b.dataset.d)); draw({ s: b.dataset.s, d: b.dataset.d }); }));
+      $$('.stepper input', root).forEach(i => {
+        i.addEventListener('focus', () => i.select());
+        i.addEventListener('change', () => { setQ(sel, i.dataset.s, parseInt(i.value || '0', 10) || 0); draw(); });
+      });
+      $('.wp-curve', root).addEventListener('click', () => { p.sizes.forEach(sz => setQ(sel, sz, qOf(sel, sz) + 1)); draw(); });
+      $$('.wp-clear', root).forEach(b => b.addEventListener('click', () => { p.sizes.forEach(sz => setQ(b.dataset.c, sz, 0)); draw(); }));
+      $('.wp-add', root).addEventListener('click', () => {
+        p.colors.forEach(c => p.sizes.forEach(sz => { if (qOf(c, sz) !== qtyInCart(p.id, c, sz)) setLine(p.id, c, sz, qOf(c, sz)); }));
+        toast(`Pedido actualizado: ${pz(draftUnits())} de ${p.name} <button class="link" id="t-open">Ver pedido</button>`);
+        $('#t-open').addEventListener('click', openCart);
+        load(); draw();
+        if (opts.onAdd) opts.onAdd();
+      });
+      if (focus) { const b = $(`.stepper button[data-s="${focus.s}"][data-d="${focus.d}"]`, root); if (b && !b.disabled) b.focus(); }
+    }
+    draw();
   }
 
   function renderCart() {
@@ -589,7 +655,7 @@
       catKey = key;
       f.prendas = f.prendas.filter(t => types.includes(t));
       $('#cat-filter-body').innerHTML = types.map(t =>
-        `<label class="chk"><input type="checkbox" name="prendas" value="${t}" ${f.prendas.includes(t) ? 'checked' : ''}/> ${GARMENT_LABEL[t]} <small class="muted">${scope.filter(p => p.garment === t).length}</small></label>`).join('');
+        `<label class="chk"><input type="checkbox" name="prendas" value="${t}" ${f.prendas.includes(t) ? 'checked' : ''}/> ${GARMENT_LABEL[t]}</label>`).join('');
     }
 
     // Talla: solo las tallas de lo que se está viendo. En Mujer u Hombre sin categoría
@@ -682,25 +748,36 @@
       else renderQuick(r);
     }
 
-    // Pedido rápido: una fila por referencia y color, una columna por talla.
+    // Pedido por mayor: cada prenda se abre y se arma con el mismo paso a paso de la ficha.
     function renderQuick(r) {
+      const inCartOf = p => state.cart.filter(i => i.id === p.id).reduce((a, i) => a + i.qty, 0);
       grid.innerHTML = `<div class="quick-head">${tierMeter()}</div>` + r.map(p => `
-        <section class="quick-item">
-          <header><a href="producto.html?id=${p.id}"><b>${p.name}</b></a><code class="muted">${p.sku}</code><span class="price b2b">${cop(unitPrice(p))} c/u</span></header>
-          <div class="matrix-wrap"><table class="matrix"><thead><tr><th scope="col">Color</th>${p.sizes.map(s => `<th scope="col">${s}</th>`).join('')}</tr></thead><tbody>
-          ${p.colors.map(c => `<tr><th scope="row"><i class="sw" style="background:${swBg(c)}"></i>${C[c].name}</th>${p.sizes.map(s => {
-            const st = window.stockFor(p.id, c, s);
-            return `<td>${st ? `<input type="number" min="0" max="${st}" inputmode="numeric" value="${qtyInCart(p.id, c, s) || ''}" placeholder="0" data-p="${p.id}" data-c="${c}" data-s="${s}" aria-label="${p.name} ${C[c].name} talla ${s}" />${st < 10 ? `<small class="low">Quedan ${st}</small>` : ''}` : '<small class="out">Agotado</small>'}</td>`;
-          }).join('')}</tr>`).join('')}
-          </tbody></table></div>
+        <section class="quick-item" data-id="${p.id}">
+          <button type="button" class="quick-row" aria-expanded="false">
+            <span class="quick-img">${garmentSVG(p.garment, p.colors[0], p.name)}</span>
+            <span class="quick-name"><b>${p.name}</b><small class="muted">Tallas ${p.sizes[0]}–${p.sizes[p.sizes.length - 1]}</small></span>
+            <span class="quick-price"><span class="price b2b">${cop(wholesale(p, T[0].off))}</span><small class="muted">por mayor</small></span>
+            <span class="quick-in">${inCartOf(p) ? `${pz(inCartOf(p))} en tu pedido` : ''}</span>
+            <span class="btn ghost sm">Elegir tallas</span>
+          </button>
+          <div class="quick-body" hidden></div>
         </section>`).join('');
-      $$('.matrix input', grid).forEach(i => i.addEventListener('change', () => {
-        const v = Math.max(0, Math.min(+i.max, parseInt(i.value || '0', 10) || 0));
-        i.value = v || '';
-        setLine(i.dataset.p, i.dataset.c, i.dataset.s, v);
-        $('.quick-head', grid).innerHTML = tierMeter();
-        $$('.quick-item .price', grid).forEach((el, k) => { el.textContent = cop(unitPrice(r[k])) + ' c/u'; });
-      }));
+      $$('.quick-item', grid).forEach(sec => {
+        const p = byId(sec.dataset.id), row = $('.quick-row', sec), body = $('.quick-body', sec);
+        row.addEventListener('click', () => {
+          const open = body.hidden;
+          body.hidden = !open;
+          row.setAttribute('aria-expanded', open);
+          $('.btn', row).textContent = open ? 'Cerrar' : 'Elegir tallas';
+          if (open && !body.dataset.ready) {
+            body.dataset.ready = '1';
+            wholesalePicker(p, body, { onAdd: () => {
+              $('.quick-head', grid).innerHTML = tierMeter();
+              $('.quick-in', row).textContent = inCartOf(p) ? `${pz(inCartOf(p))} en tu pedido` : '';
+            } });
+          }
+        });
+      });
     }
 
     render();
@@ -727,7 +804,7 @@
           <h1>${p.name}</h1>
           <code class="muted">SKU ${p.sku}</code>
           <div id="price-area"></div>
-          <div class="field"><span class="label">Color: <b id="color-name">${C[color].name}</b></span>
+          <div class="field" id="color-field"><span class="label">Color: <b id="color-name">${C[color].name}</b></span>
             <div class="swatches lg">${p.colors.map(c => `<button class="sw ${c === color ? 'on' : ''}" data-c="${c}" style="background:${swBg(c)}" aria-label="${C[c].name}" title="${C[c].name}"></button>`).join('')}</div>
           </div>
           <div id="buy-area"></div>
@@ -781,6 +858,8 @@
 
     function renderBuy() {
       const ba = $('#buy-area');
+      // En "Por mayor" el color se elige dentro del paso a paso.
+      $('#color-field').hidden = state.tab !== 'detal';
       if (state.tab === 'detal') {
         ba.innerHTML = `
           <div class="field"><span class="label">Talla</span>
@@ -804,42 +883,13 @@
           renderPrice(); renderBuy();
         });
       } else {
-        ba.innerHTML = `
-          <div class="field"><span class="label">Cantidades por color y talla</span>
-            <div class="matrix-wrap"><table class="matrix"><thead><tr><th scope="col">Color</th>${p.sizes.map(s => `<th scope="col">${s}</th>`).join('')}<th scope="col">Total</th></tr></thead><tbody>
-            ${p.colors.map(c => `<tr data-row="${c}"><th scope="row"><i class="sw" style="background:${swBg(c)}"></i>${C[c].name}</th>${p.sizes.map(s => {
-              const st = window.stockFor(p.id, c, s);
-              return `<td>${st ? `<input type="number" min="0" max="${st}" inputmode="numeric" placeholder="0" value="${qtyInCart(p.id, c, s) || ''}" data-c="${c}" data-s="${s}" aria-label="${C[c].name} talla ${s}" />${st < 10 ? `<small class="low">Quedan ${st}</small>` : ''}` : '<small class="out">Agotado</small>'}</td>`;
-            }).join('')}<td class="rt" data-rt="${c}">0</td></tr>`).join('')}
-            </tbody></table></div>
-            <div class="curve"><span class="small muted">Atajo:</span>
-              <button class="btn ghost sm" id="curve">Sumar curva completa en ${C[color].name} (1 por talla)</button>
-            </div>
-          </div>
-          <div id="pdp-summary"></div>`;
-        const upd = () => {
-          p.colors.forEach(c => { $(`[data-rt="${c}"]`).textContent = p.sizes.reduce((a, s) => a + qtyInCart(p.id, c, s), 0); });
-          const units = p.colors.reduce((a, c) => a + p.sizes.reduce((b, s) => b + qtyInCart(p.id, c, s), 0), 0);
-          $('#pdp-summary').innerHTML = `
-            <div class="pdp-sum"><span>${pz(units)} de esta referencia × ${cop(unitPrice(p))}</span><b>${cop(units * unitPrice(p))}</b></div>
-            ${tierMeter()}
-            <div class="row"><button class="btn btn-b2b grow" id="view-order">Ver pedido (${pz(cartUnits())})</button></div>
-            <p class="small muted">¿Pides más de 100 unidades o quieres un surtido armado? <a target="_blank" rel="noopener" href="${waLink('Hola, quiero cotizar la referencia ' + p.sku + ' (' + p.name + ') por volumen.')}">Cotiza con un asesor</a>.</p>`;
-          $('#view-order').addEventListener('click', openCart);
-          renderPrice();
-        };
-        $$('.matrix input', ba).forEach(i => i.addEventListener('change', () => {
-          const v = Math.max(0, Math.min(+i.max, parseInt(i.value || '0', 10) || 0));
-          i.value = v || '';
-          setLine(p.id, i.dataset.c, i.dataset.s, v);
-          upd();
-        }));
-        $('#curve').addEventListener('click', () => {
-          p.sizes.forEach(s => { if (window.stockFor(p.id, color, s)) addToCart(p.id, color, s, 1); });
-          renderBuy();
-          toast(`Curva agregada en ${C[color].name}`);
+        ba.innerHTML = `<div id="wp-root"></div>
+          <p class="small muted">¿Pides más de 100 piezas o quieres un surtido armado? <a target="_blank" rel="noopener" href="${waLink('Hola, quiero cotizar la referencia ' + p.sku + ' (' + p.name + ') por volumen.')}">Cotiza con un asesor</a>.</p>`;
+        wholesalePicker(p, $('#wp-root'), {
+          color,
+          onColor: c => { color = c; stage(); $('#color-name').textContent = C[c].name; $$('.buy .swatches .sw').forEach(b => b.classList.toggle('on', b.dataset.c === c)); },
+          onAdd: () => renderPrice()
         });
-        upd();
       }
     }
 
