@@ -20,7 +20,9 @@ window.COLORS = {
   chili:     { name: 'Rojo chili',       hex: '#9B1B30', pantone: 'Chili Pepper 19-1557 TCX',  role: 'seasonal' },
   anis:      { name: 'Amarillo anís',    hex: '#EEDFA6', pantone: 'Anise Flower 12-0717 TCX',  role: 'seasonal' },
   lima:      { name: 'Lima daiquiri',    hex: '#CFDC6E', pantone: 'Daiquiri Green 12-0435',    role: 'test' },
-  fuego:     { name: 'Naranja dragón',   hex: '#F2643A', pantone: 'Dragon Fire 16-1460 TCX',   role: 'test' }
+  fuego:     { name: 'Naranja dragón',   hex: '#F2643A', pantone: 'Dragon Fire 16-1460 TCX',   role: 'test' },
+  // Solo para piezas gráficas de la web (no son colores de prenda en venta).
+  plata:     { name: 'Plateado',         hex: '#A7AAAE', hex2: '#E9EBED', metallic: true, pantone: 'Pantone 877 C (metálico)', role: 'web' }
 };
 
 // Equipaciones de fútbol: colores aproximados, sin escudos ni logos.

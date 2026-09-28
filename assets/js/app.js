@@ -89,6 +89,10 @@
       defs = `<defs><pattern id="${id}" width="24" height="10" patternUnits="userSpaceOnUse"><rect width="24" height="10" fill="${hex}"/><rect x="12" width="12" height="10" fill="${col.hex2}"/></pattern></defs>`;
       fill = `url(#${id})`;
     }
+    if (col.metallic) {
+      defs = `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col.hex2}"/><stop offset=".45" stop-color="${hex}"/><stop offset=".6" stop-color="${col.hex2}"/><stop offset="1" stop-color="#6E7175"/></linearGradient></defs>`;
+      fill = `url(#${id})`;
+    }
     const one = (t, tf) => `<g transform="${tf || ''}"><path class="g-body" d="${SHAPES[t]}" fill="${fill}" /><g class="g-det" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round">${DETAILS[t] || ''}</g></g>`;
     let inner;
     if (type === 'set') inner = one('bra', 'translate(-38 8) scale(.9)') + one('legging', 'translate(52 16) scale(.86)');
@@ -264,7 +268,7 @@
       const q = norm(input.value.trim());
       if (q.length < 2) { box.hidden = true; return; }
       const hits = P.filter(p => norm(p.name + ' ' + p.sku + ' ' + p.colors.map(c => C[c].name).join(' ') + ' ' + p.cat).includes(q)).slice(0, 5);
-      const colorHit = Object.entries(C).find(([, v]) => v.role !== 'equipo' && norm(v.name).includes(q));
+      const colorHit = Object.entries(C).find(([, v]) => v.role !== 'equipo' && v.role !== 'web' && norm(v.name).includes(q));
       box.innerHTML = (colorHit ? `<a href="catalogo.html?color=${colorHit[0]}" class="sg-color"><i style="background:${swBg(colorHit[0])}"></i>Ver todo en ${colorHit[1].name}</a>` : '') +
         (hits.length ? hits.map(p => `<a href="producto.html?id=${p.id}"><span>${p.name}</span><code>${p.sku}</code></a>`).join('')
                      : `<p>Sin resultados para “${input.value}”. Prueba con “legging”, “oversize” o un color.</p>`);

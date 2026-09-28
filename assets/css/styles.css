@@ -577,15 +577,13 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 .collection + .collection { margin-top: 0; }
 .collection.reverse .collection-art { order: 2; }
 .collection-art { display: grid; place-items: center; background: rgba(0, 0, 0, .14); overflow: hidden; }
-.collection-art .garment { width: 42%; filter: drop-shadow(0 24px 28px rgba(0, 0, 0, .3)); transition: transform .6s var(--ease); }
+.collection-art .garment { width: min(42%, 340px); filter: drop-shadow(0 24px 28px rgba(0, 0, 0, .3)); transition: transform .6s var(--ease); }
 .collection:hover .collection-art .garment { transform: translateY(-8px) rotate(-3deg); }
 .collection-copy { padding: 48px clamp(24px, 6vw, 96px); display: grid; align-content: center; gap: 24px; justify-items: start; }
 .collection-copy h2 { font-size: clamp(2.6rem, 6vw, 5rem); letter-spacing: -.02em; }
 .collection-copy ul { list-style: none; margin: 0; padding: 0; width: 100%; max-width: 30em; }
 .collection-copy li { padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, .3); text-transform: uppercase; font-weight: 700; font-size: .86rem; letter-spacing: .04em; }
 .collection-copy li:last-child { border-bottom: 1px solid rgba(255, 255, 255, .3); }
-.c-mujer { background: #8E5566; }   /* malva profundo, familia Foxglove */
-.c-hombre { background: #4A4731; }  /* oliva, familia Burnt Olive */
 @media (max-width: 800px) {
   .collection { grid-template-columns: 1fr; min-height: 0; }
   .collection.reverse .collection-art { order: 0; }
@@ -622,3 +620,19 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
   .ts:nth-child(3) { border-left: 0; padding-left: 0; }
   .ts:nth-child(n+3) { border-top: 1px solid var(--line); }
 }
+
+/* Banner Mujer: rosa Rosy Future 15-1910 TCX (HEX aproximado) con letra negra */
+.c-mujer { background: #F2B6C3; color: var(--ink); }
+.c-mujer .collection-art { background: #F8CDD6; }
+.c-mujer .collection-copy li { border-color: rgba(23, 25, 28, .18) !important; }
+
+/* Banner Hombre: Jet Black 19-0303 TCX con plateado metálico Pantone 877 C (HEX aproximados) */
+.c-hombre { background: #1C1C1E; color: #E9EBED; }
+.c-hombre .collection-art { background: radial-gradient(circle at 50% 45%, #3A3B3F 0%, #1C1C1E 68%); }
+.c-hombre .collection-copy h2 {
+  background: linear-gradient(100deg, #8E9195 0%, #F4F5F6 38%, #A7AAAE 55%, #E9EBED 72%, #7D8084 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.c-hombre .collection-copy li { border-color: rgba(233, 235, 237, .22) !important; color: #C9CCCF; }
+.btn.silver { background: linear-gradient(100deg, #9A9DA1, #EEF0F2 45%, #A7AAAE 70%, #D9DBDE); color: var(--ink); border-color: #C9CCCF; }
+.btn.silver:hover { filter: brightness(1.08); }
