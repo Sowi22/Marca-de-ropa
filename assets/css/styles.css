@@ -659,3 +659,16 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 
 /* El rojo se reserva para precios por mayor y acciones de compra; las filas activas van en negro */
 .tiers tr.on td { background: var(--ink); color: #fff; }
+
+/* Banners Mujer y Hombre lado a lado y más bajos, para acortar la página */
+.collections { display: grid; grid-template-columns: 1fr 1fr; margin-top: 56px; }
+.collections .collection { position: relative; display: block; min-height: 360px; margin: 0; overflow: hidden; }
+.collections .collection-art { position: absolute; inset: 0; display: grid; place-items: center end; padding-right: 10%; aspect-ratio: auto; }
+.collections .collection-art .garment { width: min(38%, 230px); }
+.collections .collection-copy { position: relative; z-index: 1; min-height: 360px; padding: 32px clamp(20px, 4vw, 48px); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 16px; }
+.collections .collection-copy h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
+@media (max-width: 800px) {
+  .collections { grid-template-columns: 1fr; }
+  .collections .collection, .collections .collection-copy { min-height: 240px; }
+  .collections .collection-art .garment { width: min(34%, 150px); }
+}
