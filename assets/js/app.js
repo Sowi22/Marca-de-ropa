@@ -553,7 +553,7 @@
     const q = new URLSearchParams(location.search);
     const f = {
       genero: q.get('genero') ? [q.get('genero')] : [],
-      linea: q.get('linea') ? [q.get('linea')] : [], prenda: q.get('prenda') || '', equipo: q.get('equipo') ? [q.get('equipo')] : [],
+      linea: q.get('linea') ? [q.get('linea')] : [], prendas: q.get('prenda') ? [q.get('prenda')] : [],
       tallas: [], colores: q.get('color') ? [q.get('color')] : [],
       cat: q.get('cat') || '', tag: q.get('tag') || '', q: (q.get('q') || '').toLowerCase(),
       stock: false, sort: 'rel', view: q.get('vista') === 'lista' ? 'lista' : 'grid'
@@ -568,23 +568,39 @@
     ];
     const usedColors = Object.keys(C).filter(k => C[k].role !== 'equipo' && P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
-      <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
+      <fieldset id="cat-filter"><legend>Categoría</legend><div id="cat-filter-body"></div></fieldset>
       <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${LINE_LABEL[g]}</label>`).join('')}</fieldset>
-      <fieldset id="team-filter"><legend>Equipo de fútbol</legend>${Object.entries(window.TEAMS).map(([k, t]) => `<label class="chk"><input type="checkbox" name="equipo" value="${k}" ${f.equipo.includes(k) ? 'checked' : ''}/> <i class="sw" style="background:${swBg(k + '-l')}"></i>${t}</label>`).join('')}</fieldset>
       <fieldset id="size-filter"><legend>Talla</legend><div id="size-filter-body"></div></fieldset>
       <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${swBg(c)}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
 
+    // Prendas de la sección actual (Mujer incluye las unisex, como en la lista de productos).
+    const inSection = p => (!f.genero.length || f.genero.includes(p.gender) || (p.gender === 'unisex' && f.genero.some(g => g !== 'unisex'))) &&
+      (!f.linea.length || f.linea.includes(p.line)) && (!f.cat || p.cat === f.cat) && (!f.tag || p.tags.includes(f.tag));
+
+    // Categoría: todos los tipos de prenda que existen en la sección, con su cantidad.
+    let catKey = '';
+    function renderCategoryFilter() {
+      const scope = P.filter(inSection);
+      const order = ['deportiva', 'casual'];
+      const types = [...new Set(scope.slice().sort((x, y) => order.indexOf(x.line) - order.indexOf(y.line)).map(p => p.garment))];
+      const key = types.join();
+      if (key === catKey) return;
+      catKey = key;
+      f.prendas = f.prendas.filter(t => types.includes(t));
+      $('#cat-filter-body').innerHTML = types.map(t =>
+        `<label class="chk"><input type="checkbox" name="prendas" value="${t}" ${f.prendas.includes(t) ? 'checked' : ''}/> ${GARMENT_LABEL[t]} <small class="muted">${scope.filter(p => p.garment === t).length}</small></label>`).join('');
+    }
+
+    // Talla: solo las tallas de lo que se está viendo. En Mujer u Hombre sin categoría
+    // elegida no se suman las tallas unisex (S–XL): en Mujer quedan 6, 8, 10 y 12.
     let sizeKey = '';
     function renderSizeFilter() {
-      // Tallas de las prendas que se están viendo. En Mujer u Hombre no se suman las unisex (S–XL).
-      const scope = P.filter(p => (!f.genero.length || f.genero.includes(p.gender)) &&
-        (!f.linea.length || f.linea.includes(p.line)) && (!f.prenda || p.garment === f.prenda) &&
-        (!f.equipo.length || f.equipo.includes(p.team)) && (!f.cat || p.cat === f.cat) && (!f.tag || p.tags.includes(f.tag)));
+      const scope = P.filter(p => inSection(p) && (!f.prendas.length || f.prendas.includes(p.garment)) &&
+        (f.prendas.length || !f.genero.length || f.genero.includes(p.gender)));
       const groups = sizeGroups
         .map(g => ({ label: g.label, sizes: g.sizes.filter(sz => scope.some(p => p.sizes.includes(sz))) }))
         .filter(g => g.sizes.length);
-      $('#team-filter').hidden = !scope.some(p => p.team);
       const key = groups.map(g => g.label + g.sizes.join()).join('|');
       if (key === sizeKey) return;
       sizeKey = key;
@@ -607,7 +623,7 @@
     $('#open-filters').addEventListener('click', () => document.body.classList.add('filters-open'));
     $$('[data-close-filters]').forEach(b => b.addEventListener('click', () => document.body.classList.remove('filters-open')));
     $('#clear-filters').addEventListener('click', () => {
-      Object.assign(f, { genero: [], linea: [], prenda: '', equipo: [], tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
+      Object.assign(f, { genero: [], linea: [], prendas: [], tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
       $$('#filters-body input').forEach(i => { i.checked = false; });
       $('#q').value = '';
       render();
@@ -617,8 +633,7 @@
       let r = P.filter(p =>
         (!f.genero.length || f.genero.includes(p.gender) || (p.gender === 'unisex' && f.genero.some(g => g !== 'unisex'))) &&
         (!f.linea.length || f.linea.includes(p.line)) &&
-        (!f.prenda || p.garment === f.prenda) &&
-        (!f.equipo.length || f.equipo.includes(p.team)) &&
+        (!f.prendas.length || f.prendas.includes(p.garment)) &&
         (!f.tallas.length || p.sizes.some(s => f.tallas.includes(s))) &&
         (!f.colores.length || p.colors.some(c => f.colores.includes(c))) &&
         (!f.cat || p.cat === f.cat || (f.cat === 'unisex' && p.gender === 'unisex')) &&
@@ -635,10 +650,9 @@
       const c = [];
       f.genero.forEach(v => c.push(['genero', v, v]));
       f.linea.forEach(v => c.push(['linea', v, LINE_LABEL[v]]));
-      f.equipo.forEach(v => c.push(['equipo', v, window.TEAMS[v]]));
       f.tallas.forEach(v => c.push(['tallas', v, 'Talla ' + v]));
       f.colores.forEach(v => c.push(['colores', v, C[v].name]));
-      if (f.prenda) c.push(['prenda', f.prenda, GARMENT_LABEL[f.prenda] || f.prenda]);
+      f.prendas.forEach(v => c.push(['prendas', v, GARMENT_LABEL[v] || v]));
       if (f.cat) c.push(['cat', f.cat, (window.CATEGORIES.find(x => x.id === f.cat) || {}).name || f.cat]);
       if (f.tag) c.push(['tag', f.tag, f.tag === 'nuevo' ? 'Novedades' : 'Más vendidos']);
       if (f.q) c.push(['q', f.q, '“' + f.q + '”']);
@@ -653,11 +667,12 @@
     }
 
     function render() {
+      renderCategoryFilter();
+      renderSizeFilter();
       const r = list();
       const g1 = f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : '';
-      const title = f.equipo.length === 1 ? 'Camisetas ' + window.TEAMS[f.equipo[0]] : f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
+      const title = f.prendas.length === 1 ? GARMENT_LABEL[f.prendas[0]] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
       $('#cat-title').textContent = title;
-      renderSizeFilter();
       $$('.view-toggle button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === f.view));
       chips();
       const view = f.view;
