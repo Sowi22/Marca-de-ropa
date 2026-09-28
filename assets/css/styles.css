@@ -619,21 +619,18 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
   .ts:nth-child(n+3) { border-top: 1px solid var(--line); }
 }
 
-/* Banner Mujer: rosa Rosy Future 15-1910 TCX (HEX aproximado) con letra negra */
-.c-mujer { background: #F2B6C3; color: var(--ink); }
-.c-mujer .collection-art { background: #F8CDD6; }
-.c-mujer .collection-copy li { border-color: rgba(23, 25, 28, .18) !important; }
+/* Banners de sección: fondos claros y botón rojo de compra en los dos.
+   HEX aproximados; validar con guía física Pantone. */
 
-/* Banner Hombre: Jet Black 19-0303 TCX con plateado metálico Pantone 877 C (HEX aproximados) */
-.c-hombre { background: #1C1C1E; color: #E9EBED; }
-.c-hombre .collection-art { background: radial-gradient(circle at 50% 45%, #3A3B3F 0%, #1C1C1E 68%); }
-.c-hombre .collection-copy h2 {
-  background: linear-gradient(100deg, #8E9195 0%, #F4F5F6 38%, #A7AAAE 55%, #E9EBED 72%, #7D8084 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.c-hombre .collection-copy li { border-color: rgba(233, 235, 237, .22) !important; color: #C9CCCF; }
-.btn.silver { background: linear-gradient(100deg, #9A9DA1, #EEF0F2 45%, #A7AAAE 70%, #D9DBDE); color: var(--ink); border-color: #C9CCCF; }
-.btn.silver:hover { filter: brightness(1.08); }
+/* Mujer: rosa claro, tinte de Rosy Future 15-1910 TCX */
+.c-mujer { background: #F9DCE2; color: var(--ink); }
+.c-mujer .collection-art { background: #FCEBEF; }
+.c-mujer .collection-copy li { border-color: rgba(28, 28, 30, .14) !important; }
+
+/* Hombre: plateado claro, Glacier Gray 14-4102 TCX con brillo metálico */
+.c-hombre { background: linear-gradient(115deg, #E4E6E9 0%, #F3F4F5 45%, #DDE0E3 100%); color: var(--ink); }
+.c-hombre .collection-art { background: radial-gradient(circle at 50% 42%, #FFFFFF 0%, #E9EBED 55%, #D3D6DA 100%); }
+.c-hombre .collection-copy li { border-color: rgba(28, 28, 30, .14) !important; }
 
 /* =====================================================================
    Paleta de la marca (HEX aproximados de Pantone; validar con guía física)

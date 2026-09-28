@@ -22,6 +22,7 @@ window.COLORS = {
   lima:      { name: 'Lima daiquiri',    hex: '#CFDC6E', pantone: 'Daiquiri Green 12-0435',    role: 'test' },
   fuego:     { name: 'Naranja dragón',   hex: '#F2643A', pantone: 'Dragon Fire 16-1460 TCX',   role: 'test' },
   // Solo para piezas gráficas de la web (no son colores de prenda en venta).
+  rojo:      { name: 'Rojo',             hex: '#DD3848', pantone: 'Hibiscus 18-1762 TCX',     role: 'web' },
   rosa:      { name: 'Rosa',             hex: '#F2B6C3', pantone: 'Rosy Future 15-1910 TCX',  role: 'web' },
   plata:     { name: 'Plateado',         hex: '#A7AAAE', hex2: '#E9EBED', metallic: true, pantone: 'Pantone 877 C (metálico)', role: 'web' }
 };
