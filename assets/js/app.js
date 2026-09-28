@@ -500,11 +500,6 @@
       const n = P.filter(p => matchesQuery(p, new URLSearchParams(c.href.split('?')[1]))).length;
       return `<a class="cat" href="${c.href}"><div class="cat-img">${garmentSVG(c.garment, c.color, c.name)}</div><span>${c.name}</span><small class="muted">${n} referencias</small></a>`;
     }).join('');
-    const float = $('#hero-float');
-    if (float) {
-      const pieces = [['jersey', 'junior-v', 'Camiseta de fútbol'], ['legging', 'negro', 'Legging'], ['hoodie', 'plata', 'Suéter con capota'], ['skirt', 'rosa', 'Falda deportiva'], ['tee', 'negro', 'Camiseta dry-fit']];
-      float.innerHTML = pieces.map(([g, c, l], i) => `<div class="fl fl-${i + 1}">${garmentSVG(g, c, l)}</div>`).join('');
-    }
     $$('.collection-art[data-g]').forEach(el => { el.innerHTML = garmentSVG(el.dataset.g, el.dataset.c, el.closest('.collection').querySelector('h2').textContent); });
     const newIn = $('#new-in');
     if (newIn) { newIn.innerHTML = P.filter(p => p.tags.includes('nuevo')).slice(0, 8).map(card).join(''); bindCards(newIn); }
