@@ -514,14 +514,35 @@
     if (f.q) $('#q').value = q.get('q');
 
     // Dama en numeración colombiana, caballero en letras, pantalón de hombre por cintura.
-    const sizeGroups = [['Dama', ['6', '8', '10', '12']], ['Caballero y unisex', ['S', 'M', 'L', 'XL', 'XXL']], ['Pantalón hombre', ['28', '30', '32', '34', '36']]];
+    const sizeGroups = [
+      { label: 'Mujer', sizes: ['6', '8', '10', '12'] },
+      { label: 'Hombre', sizes: ['S', 'M', 'L', 'XL', 'XXL'] },
+      { label: 'Pantalón hombre', sizes: ['28', '30', '32', '34', '36'] }
+    ];
     const usedColors = Object.keys(C).filter(k => P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
       <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
       <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
-      <fieldset><legend>Talla</legend>${sizeGroups.map(([g, sizes]) => `<p class="size-group">${g}</p><div class="size-grid">${sizes.map(s => `<label class="size-chip"><input type="checkbox" name="tallas" value="${s}"/><span>${s}</span></label>`).join('')}</div>`).join('')}</fieldset>
+      <fieldset id="size-filter"><legend>Talla</legend><div id="size-filter-body"></div></fieldset>
       <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${C[c].hex}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
+
+    let sizeKey = '';
+    function renderSizeFilter() {
+      const scope = P.filter(p => !f.genero.length || f.genero.includes(p.gender));
+      const groups = sizeGroups
+        .map(g => ({ label: g.label, sizes: g.sizes.filter(sz => scope.some(p => p.sizes.includes(sz))) }))
+        .filter(g => g.sizes.length);
+      const key = groups.map(g => g.label + g.sizes.join()).join('|');
+      if (key === sizeKey) return;
+      sizeKey = key;
+      const all = groups.flatMap(g => g.sizes);
+      f.tallas = f.tallas.filter(sz => all.includes(sz));
+      const chip = sz => `<label class="size-chip"><input type="checkbox" name="tallas" value="${sz}" ${f.tallas.includes(sz) ? 'checked' : ''}/><span>${sz}</span></label>`;
+      // Con un solo grupo (por ejemplo Mujer) no hace falta rótulo.
+      $('#size-filter-body').innerHTML = groups.map(g =>
+        `${groups.length > 1 ? `<p class="size-group">${g.label}</p>` : ''}<div class="size-grid">${g.sizes.map(chip).join('')}</div>`).join('');
+    }
 
     $('#filters-body').addEventListener('change', e => {
       const n = e.target.name;
@@ -582,7 +603,7 @@
       const g1 = f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : '';
       const title = f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
       $('#cat-title').textContent = title;
-      $('#result-count').textContent = r.length + (r.length === 1 ? ' referencia' : ' referencias');
+      renderSizeFilter();
       $$('.view-toggle button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === f.view));
       chips();
       const view = f.view;
