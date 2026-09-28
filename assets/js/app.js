@@ -84,12 +84,75 @@
   }
 
   /* ---------- Header, footer, drawer ---------- */
+  // Menú: cada opción despliega sus categorías al pasar el cursor (o al tocar en móvil).
+  const GARMENT_LABEL = {
+    legging: 'Leggings', bra: 'Tops deportivos', set: 'Conjuntos', biker: 'Bikers',
+    crop: 'Camisetas crop', oversize: 'Camisetas oversize', jogger: 'Joggers', tee: 'Camisetas deportivas',
+    short: 'Pantalonetas', polo: 'Polos', bermuda: 'Bermudas', hoodie: 'Buzos'
+  };
+  const forGender = (p, g) => p.gender === g || p.gender === 'unisex';
+  function featureCard(p, label) {
+    if (!p) return '';
+    return `<a class="mega-feat" href="producto.html?id=${p.id}">
+      <div class="mega-img">${garmentSVG(p.garment, p.colors[0], p.name)}</div>
+      <span class="eyebrow">${label}</span><b>${p.name}</b>
+      <span class="small">${cop(p.price)} detal · <span class="b2b-t">${cop(wholesale(p, T[0].off))} por mayor</span></span>
+    </a>`;
+  }
+  function genderMenu(g) {
+    const cols = ['deportiva', 'casual'].map(line => {
+      const ps = P.filter(p => forGender(p, g) && p.line === line);
+      const types = [...new Set(ps.map(p => p.garment))];
+      return `<div class="mega-col">
+        <a class="mega-h" href="catalogo.html?genero=${g}&linea=${line}">${line === 'deportiva' ? 'Deportiva' : 'Casual'}</a>
+        <ul>${types.map(t => `<li><a href="catalogo.html?genero=${g}&linea=${line}&prenda=${t}">${GARMENT_LABEL[t]}<small>${ps.filter(p => p.garment === t).length}</small></a></li>`).join('')}
+          <li><a class="mega-all" href="catalogo.html?genero=${g}&linea=${line}">Ver toda la línea ${line}</a></li></ul>
+      </div>`;
+    }).join('');
+    const quick = `<div class="mega-col">
+      <span class="mega-h">Destacados</span>
+      <ul><li><a href="catalogo.html?genero=${g}&tag=nuevo">Novedades</a></li>
+        <li><a href="catalogo.html?genero=${g}&tag=bestseller">Más vendidos</a></li>
+        <li><a href="catalogo.html?genero=${g}&vista=lista">Pedido por mayor</a></li>
+        <li><a class="mega-all" href="catalogo.html?genero=${g}">Ver todo ${g === 'mujer' ? 'Mujer' : 'Hombre'}</a></li></ul>
+    </div>`;
+    const feat = P.find(p => p.gender === g && p.tags.includes('bestseller'));
+    return cols + quick + featureCard(feat, 'Más vendido');
+  }
+  function tagMenu(tag, label) {
+    const cols = ['mujer', 'hombre'].map(g => {
+      const ps = P.filter(p => forGender(p, g) && p.tags.includes(tag));
+      return `<div class="mega-col">
+        <a class="mega-h" href="catalogo.html?genero=${g}&tag=${tag}">${g === 'mujer' ? 'Mujer' : 'Hombre'}</a>
+        <ul>${ps.map(p => `<li><a href="producto.html?id=${p.id}">${p.name}</a></li>`).join('')}
+          <li><a class="mega-all" href="catalogo.html?genero=${g}&tag=${tag}">Ver todo</a></li></ul>
+      </div>`;
+    }).join('');
+    const feats = P.filter(p => p.tags.includes(tag)).slice(0, 2);
+    return cols + feats.map(p => featureCard(p, label)).join('');
+  }
+  function b2bMenu() {
+    return `<div class="mega-col">
+        <span class="mega-h">Cómo comprar por mayor</span>
+        <ul><li><a href="mayoristas.html">Cómo funciona</a></li>
+          <li><a href="mayoristas.html#niveles">Precios por cantidad</a></li>
+          <li><a href="catalogo.html?vista=lista">Pedido por mayor</a></li>
+          <li><a href="mayoristas.html#faq">Preguntas de mayoristas</a></li>
+          <li><a href="mayoristas.html#asesor">Hablar con un asesor</a></li></ul>
+      </div>
+      <div class="mega-col mega-tiers">
+        <span class="mega-h">Precio según piezas en tu pedido</span>
+        <ul>${T.map((t, i) => `<li><span>${t.name}</span><span>${t.min}${T[i + 1] ? '–' + (T[i + 1].min - 1) : '+'} pzs · −${t.off * 100}%</span></li>`).join('')}</ul>
+        <p class="small muted">Mezcla referencias, tallas y colores para llegar a ${T[0].min} piezas.</p>
+        <a class="btn btn-b2b sm" href="catalogo.html?vista=lista">Armar pedido por mayor</a>
+      </div>`;
+  }
   const NAV = [
-    ['catalogo.html?genero=mujer', 'Mujer'],
-    ['catalogo.html?genero=hombre', 'Hombre'],
-    ['catalogo.html?tag=nuevo', 'Novedades'],
-    ['catalogo.html?tag=bestseller', 'Más vendidos'],
-    ['mayoristas.html', 'Comprar por mayor']
+    { href: 'catalogo.html?genero=mujer', label: 'Mujer', menu: () => genderMenu('mujer') },
+    { href: 'catalogo.html?genero=hombre', label: 'Hombre', menu: () => genderMenu('hombre') },
+    { href: 'catalogo.html?tag=nuevo', label: 'Novedades', menu: () => tagMenu('nuevo', 'Nuevo') },
+    { href: 'catalogo.html?tag=bestseller', label: 'Más vendidos', menu: () => tagMenu('bestseller', 'Más vendido') },
+    { href: 'mayoristas.html', label: 'Comprar por mayor', menu: b2bMenu, cls: 'nav-b2b' }
   ];
   const ANNOUNCE = [
     'Precio por mayor desde <b>' + T[0].min + ' piezas</b> mezclando referencias, tallas y colores',
@@ -108,7 +171,10 @@
         </button>
         <a href="index.html" class="logo" aria-label="Inicio">MARCA<span>®</span></a>
         <nav class="nav" id="nav" aria-label="Principal">
-          ${NAV.map(([h, t]) => `<a href="${h}" class="${h === 'mayoristas.html' ? 'nav-b2b' : ''}">${t}</a>`).join('')}
+          ${NAV.map((n, k) => `<div class="nav-item">
+            <a href="${n.href}" class="nav-top ${n.cls || ''}" aria-haspopup="true" aria-expanded="false" aria-controls="mega-${k}">${n.label}</a>
+            <div class="mega" id="mega-${k}"><div class="wrap mega-in">${n.menu()}</div></div>
+          </div>`).join('')}
         </nav>
         <form class="search" role="search" action="catalogo.html">
           <label for="q" class="sr">Buscar</label>
@@ -131,6 +197,26 @@
     }, 4200);
 
     $('#cart-btn').addEventListener('click', openCart);
+    // Escritorio: abre al pasar el cursor, con una pequeña espera para no parpadear al cruzar el menú.
+    // Móvil: el primer toque despliega la lista en lugar de navegar.
+    const items = $$('.nav-item');
+    const setOpen = (it, open) => { it.classList.toggle('open', open); $('.nav-top', it).setAttribute('aria-expanded', open); };
+    const desktop = () => matchMedia('(min-width: 1024px) and (hover: hover)').matches;
+    items.forEach(it => {
+      let t;
+      it.addEventListener('mouseenter', () => { if (!desktop()) return; clearTimeout(t); t = setTimeout(() => { items.forEach(o => setOpen(o, o === it)); }, 90); });
+      it.addEventListener('mouseleave', () => { if (!desktop()) return; clearTimeout(t); t = setTimeout(() => setOpen(it, false), 160); });
+      it.addEventListener('focusin', () => { if (desktop()) items.forEach(o => setOpen(o, o === it)); });
+      it.addEventListener('focusout', e => { if (!it.contains(e.relatedTarget)) setOpen(it, false); });
+      $('.nav-top', it).addEventListener('click', e => {
+        if (desktop()) return;
+        e.preventDefault();
+        const open = !it.classList.contains('open');
+        items.forEach(o => setOpen(o, false));
+        setOpen(it, open);
+      });
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') items.forEach(o => setOpen(o, false)); });
     $('#menu-btn').addEventListener('click', () => {
       const open = document.body.classList.toggle('menu-open');
       $('#menu-btn').setAttribute('aria-expanded', open);
@@ -420,7 +506,8 @@
     const q = new URLSearchParams(location.search);
     const f = {
       genero: q.get('genero') ? [q.get('genero')] : [],
-      linea: [], tallas: [], colores: q.get('color') ? [q.get('color')] : [],
+      linea: q.get('linea') ? [q.get('linea')] : [], prenda: q.get('prenda') || '',
+      tallas: [], colores: q.get('color') ? [q.get('color')] : [],
       cat: q.get('cat') || '', tag: q.get('tag') || '', q: (q.get('q') || '').toLowerCase(),
       stock: false, sort: 'rel', view: q.get('vista') === 'lista' ? 'lista' : 'grid'
     };
@@ -430,7 +517,7 @@
     const usedColors = Object.keys(C).filter(k => P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
       <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
-      <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}"/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
+      <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
       <fieldset><legend>Talla</legend><div class="size-grid">${allSizes.map(s => `<label class="size-chip"><input type="checkbox" name="tallas" value="${s}"/><span>${s}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${C[c].hex}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
@@ -446,7 +533,7 @@
     $('#open-filters').addEventListener('click', () => document.body.classList.add('filters-open'));
     $$('[data-close-filters]').forEach(b => b.addEventListener('click', () => document.body.classList.remove('filters-open')));
     $('#clear-filters').addEventListener('click', () => {
-      Object.assign(f, { genero: [], linea: [], tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
+      Object.assign(f, { genero: [], linea: [], prenda: '', tallas: [], colores: [], cat: '', tag: '', q: '', stock: false });
       $$('#filters-body input').forEach(i => { i.checked = false; });
       $('#q').value = '';
       render();
@@ -454,8 +541,9 @@
 
     function list() {
       let r = P.filter(p =>
-        (!f.genero.length || f.genero.includes(p.gender)) &&
+        (!f.genero.length || f.genero.includes(p.gender) || (p.gender === 'unisex' && f.genero.some(g => g !== 'unisex'))) &&
         (!f.linea.length || f.linea.includes(p.line)) &&
+        (!f.prenda || p.garment === f.prenda) &&
         (!f.tallas.length || p.sizes.some(s => f.tallas.includes(s))) &&
         (!f.colores.length || p.colors.some(c => f.colores.includes(c))) &&
         (!f.cat || p.cat === f.cat || (f.cat === 'unisex' && p.gender === 'unisex')) &&
@@ -474,6 +562,7 @@
       f.linea.forEach(v => c.push(['linea', v, v]));
       f.tallas.forEach(v => c.push(['tallas', v, 'Talla ' + v]));
       f.colores.forEach(v => c.push(['colores', v, C[v].name]));
+      if (f.prenda) c.push(['prenda', f.prenda, GARMENT_LABEL[f.prenda] || f.prenda]);
       if (f.cat) c.push(['cat', f.cat, (window.CATEGORIES.find(x => x.id === f.cat) || {}).name || f.cat]);
       if (f.tag) c.push(['tag', f.tag, f.tag === 'nuevo' ? 'Novedades' : 'Más vendidos']);
       if (f.q) c.push(['q', f.q, '“' + f.q + '”']);
@@ -489,7 +578,8 @@
 
     function render() {
       const r = list();
-      const title = f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
+      const g1 = f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : '';
+      const title = f.prenda ? GARMENT_LABEL[f.prenda] + (g1 ? ' · ' + g1 : '') : f.cat ? (window.CATEGORIES.find(x => x.id === f.cat) || {}).name : f.tag === 'nuevo' ? 'Novedades' : f.tag === 'bestseller' ? 'Más vendidos' : f.genero.length === 1 ? (f.genero[0] === 'mujer' ? 'Mujer' : f.genero[0] === 'hombre' ? 'Hombre' : 'Unisex') : 'Catálogo';
       $('#cat-title').textContent = title;
       $('#result-count').textContent = r.length + (r.length === 1 ? ' referencia' : ' referencias');
       $$('.view-toggle button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === f.view));
