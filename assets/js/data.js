@@ -57,6 +57,7 @@ window.BUSINESS = {
   whatsapp: '573000000000',          // [DATO REQUERIDO] número real de WhatsApp Business
   retailFreeShipping: 199900,        // [SUPUESTO] envío gratis al detal desde este valor
   wholesaleFreeShippingUnits: 36,    // [SUPUESTO] envío gratis por mayor desde estas piezas
+  minPerRef: 4,                      // Regla del negocio: mínimo 4 unidades de la misma prenda (colores y tallas mezclados)
   dispatch: '24–48 h hábiles',       // [SUPUESTO]
   city: '[CIUDAD DE DESPACHO]'       // [DATO REQUERIDO]
 };

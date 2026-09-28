@@ -26,15 +26,23 @@
   const wholesale = (p, off) => round100(p.price * (1 - off));
 
   function cartUnits() { return state.cart.reduce((a, i) => a + i.qty, 0); }
-  // El nivel se decide por piezas en todo el pedido (mezclando referencias, tallas y colores).
+  // Regla por mayor: cada prenda necesita mínimo 4 unidades (se mezclan colores y tallas).
+  // Solo las prendas que cumplen suman para el nivel (12 / 36 / 72 piezas en el pedido).
+  const MIN_REF = B.minPerRef || 4;
+  const refUnits = id => state.cart.filter(i => i.id === id).reduce((a, i) => a + i.qty, 0);
+  function qualifyingUnits() {
+    const by = {};
+    state.cart.forEach(i => { by[i.id] = (by[i.id] || 0) + i.qty; });
+    return Object.values(by).filter(n => n >= MIN_REF).reduce((a, n) => a + n, 0);
+  }
   function tierFor(units) { let t = null; T.forEach(x => { if (units >= x.min) t = x; }); return t; }
-  function currentTier() { return tierFor(cartUnits()); }
-  function nextTier() { const u = cartUnits(); return T.find(x => u < x.min) || null; }
+  function currentTier() { return tierFor(qualifyingUnits()); }
+  function nextTier() { const u = qualifyingUnits(); return T.find(x => u < x.min) || null; }
   const isWholesale = () => !!currentTier();
-  // Mismo precio para todo el pedido: detal por debajo de 12 piezas, por mayor desde 12.
+  // Precio por mayor solo si el pedido alcanza el nivel y esta prenda lleva 4 o más.
   function unitPrice(p) {
     const t = currentTier();
-    return t ? wholesale(p, t.off) : p.price;
+    return t && refUnits(p.id) >= MIN_REF ? wholesale(p, t.off) : p.price;
   }
   function cartTotals() {
     const retail = state.cart.reduce((a, i) => a + byId(i.id).price * i.qty, 0);
@@ -173,7 +181,7 @@
       <div class="mega-col mega-tiers">
         <span class="mega-h">Precio según piezas en tu pedido</span>
         <ul>${T.map((t, i) => `<li><span>${t.name}</span><span>${t.min}${T[i + 1] ? '–' + (T[i + 1].min - 1) : '+'} pzs · −${t.off * 100}%</span></li>`).join('')}</ul>
-        <p class="small muted">Mezcla referencias, tallas y colores para llegar a ${T[0].min} piezas.</p>
+        <p class="small muted">Mínimo ${MIN_REF} piezas por prenda (mezcla colores y tallas) y ${T[0].min} en el pedido.</p>
         <a class="btn btn-b2b sm" href="catalogo.html?vista=lista">Armar pedido por mayor</a>
       </div>`;
   }
@@ -185,7 +193,7 @@
     { href: 'mayoristas.html', label: 'Comprar por mayor', menu: b2bMenu, cls: 'nav-b2b' }
   ];
   const ANNOUNCE = [
-    'Precio por mayor desde <b>' + T[0].min + ' piezas</b> mezclando referencias, tallas y colores',
+    'Precio por mayor: mínimo <b>' + (B.minPerRef || 4) + ' piezas por prenda</b> y <b>' + T[0].min + ' en el pedido</b>',
     'Envío gratis a toda Colombia desde <b>' + B.wholesaleFreeShippingUnits + ' piezas</b> o <b>' + cop(B.retailFreeShipping) + '</b> al detal',
     'Paga con PSE, Nequi, Bancolombia o tarjeta · Despacho en <b>' + B.dispatch + '</b>'
   ];
@@ -336,11 +344,11 @@
 
   const pz = n => n + (n === 1 ? ' pieza' : ' piezas');
   function tierMeter(compact, units) {
-    const u = units == null ? cartUnits() : units, cur = tierFor(u), nxt = T.find(x => u < x.min);
+    const u = units == null ? qualifyingUnits() : units, cur = tierFor(u), nxt = T.find(x => u < x.min);
     const goal = T[T.length - 1].min;
     let msg;
-    if (!u) msg = `Desde <b>${T[0].min} piezas</b> en tu pedido pagas precio por mayor. Puedes mezclar prendas, tallas y colores.`;
-    else if (!cur) msg = `Llevas <b>${u} de ${T[0].min} piezas</b> para el precio por mayor. Te faltan <b>${T[0].min - u}</b>.`;
+    if (!u) msg = `Precio por mayor: mínimo <b>${MIN_REF} piezas de cada prenda</b> (mezcla colores y tallas) y <b>${T[0].min} en todo el pedido</b>.`;
+    else if (!cur) msg = `Llevas <b>${u} de ${T[0].min} piezas</b> para el precio por mayor. Te faltan <b>${T[0].min - u}</b> (cada prenda con mínimo ${MIN_REF}).`;
     else if (nxt) msg = `Ya tienes <b>precio por mayor (−${cur.off * 100}%)</b>. Con <b>${nxt.min - u} piezas más</b> todo baja a −${nxt.off * 100}%.`;
     else msg = `Tienes el <b>mejor precio (−${cur.off * 100}%)</b>.`;
     return `<div class="meter ${compact ? 'compact' : ''}">
@@ -367,8 +375,13 @@
 
     function draw(focus) {
       const n = draftUnits(), inCart = cartOfProduct();
-      const orderUnits = cartUnits() - inCart + n;            // cómo quedaría el pedido completo
-      const t = tierFor(orderUnits), price = t ? wholesale(p, t.off) : p.price;
+      // Cómo quedaría el pedido: las otras prendas que ya cumplen + esta si llega a 4.
+      const others = qualifyingUnits() - (inCart >= MIN_REF ? inCart : 0);
+      const orderUnits = others + (n >= MIN_REF ? n : 0);
+      const t = tierFor(orderUnits), price = t && n >= MIN_REF ? wholesale(p, t.off) : p.price;
+      const refNote = !n ? `Mínimo <b>${MIN_REF} piezas de esta prenda</b> para precio por mayor. Puedes mezclar colores y tallas.`
+        : n < MIN_REF ? `Te ${MIN_REF - n === 1 ? 'falta' : 'faltan'} <b>${MIN_REF - n}</b> de esta prenda para llegar al mínimo de ${MIN_REF} (puedes mezclar colores y tallas).`
+        : `✓ Esta prenda ya cumple el mínimo de ${MIN_REF} piezas.`;
       const chosen = p.colors.filter(c => colorUnits(c));
       const changed = p.colors.some(c => p.sizes.some(sz => qOf(c, sz) !== qtyInCart(p.id, c, sz)));
       root.innerHTML = `
@@ -390,6 +403,7 @@
           <p class="wp-step"><span class="wp-n">3</span>Revisa y agrega</p>
           <div class="wp-summary">${chosen.length ? chosen.map(c => `<div class="wp-line"><span><i class="sw" style="background:${swBg(c)}"></i><b>${C[c].name}</b> · ${p.sizes.filter(sz => qOf(c, sz)).map(sz => `talla ${sz}: ${qOf(c, sz)}`).join(', ')}</span><button type="button" class="link wp-clear" data-c="${c}">Quitar</button></div>`).join('')
             : '<p class="muted small">Todavía no has elegido tallas.</p>'}</div>
+          <p class="wp-rule ${n >= MIN_REF ? 'ok' : ''}">${refNote}</p>
           <div class="wp-total"><span>${pz(n)} × ${cop(price)}</span><b>${cop(n * price)}</b></div>
           <button type="button" class="btn btn-b2b block wp-add" ${changed ? '' : 'disabled'}>${!changed && inCart ? '✓ Ya está en tu pedido' : inCart ? `Actualizar pedido (${pz(n)})` : n ? `Agregar ${pz(n)} al pedido` : 'Elige tallas para agregar'}</button>
           ${tierMeter(false, orderUnits)}
@@ -435,6 +449,7 @@
         <div class="line-body">
           <div class="line-top"><a href="producto.html?id=${id}">${p.name}</a><b>${cop(unitPrice(p) * units)}</b></div>
           <code class="muted">${p.sku} · ${units} u. × ${cop(unitPrice(p))}</code>
+          ${units < MIN_REF ? `<p class="line-rule">Suma ${MIN_REF - units} más de esta prenda (mín. ${MIN_REF}) para precio por mayor.</p>` : ''}
           <ul class="line-vars">${lines.map(l => `<li><i class="sw" style="background:${swBg(l.color)}"></i>${C[l.color].name} · ${l.size}
             <span class="qty sm"><button data-dec="${l.idx}" aria-label="Restar">−</button><output>${l.qty}</output><button data-inc="${l.idx}" aria-label="Sumar">+</button></span></li>`).join('')}</ul>
         </div>
@@ -504,7 +519,7 @@
   /* ---------- Tarjeta de producto ---------- */
   function priceBlock(p) {
     return `<span class="price">${cop(p.price)} <small class="muted">detal</small></span>
-      <span class="price b2b">${cop(wholesale(p, T[0].off))} <small>por mayor · desde ${T[0].min} pzs</small></span>`;
+      <span class="price b2b">${cop(wholesale(p, T[0].off))} <small>por mayor · mín. ${MIN_REF} pzs</small></span>`;
   }
   function card(p) {
     const tag = p.tags.includes('nuevo') ? '<span class="tag">Nuevo</span>' : p.tags.includes('bestseller') ? '<span class="tag dark">Más vendido</span>' : '';
@@ -581,7 +596,7 @@
     const el = $('#tiers-strip');
     if (!el) return;
     const ex = byId('legging-flex') || P[0];
-    const extra = ['Tu primer pedido por mayor', 'Envío gratis a toda Colombia', 'Asesor asignado y factura'];
+    const extra = ['Mínimo ' + MIN_REF + ' piezas por prenda', 'Envío gratis a toda Colombia', 'Asesor asignado y factura'];
     el.innerHTML = `
       <div class="ts detal">
         <p class="ts-name">Detal</p>
@@ -843,10 +858,10 @@
       pa.innerHTML = `
         <div class="buy-modes" role="tablist" aria-label="Tipo de compra">
           <button role="tab" class="bm ${d ? 'on' : ''}" data-tab="detal" aria-selected="${d}">
-            <span class="bm-l">Al detal</span><span class="bm-p">${cop(p.price)}</span><span class="bm-s">1 a ${T[0].min - 1} piezas</span>
+            <span class="bm-l">Al detal</span><span class="bm-p">${cop(p.price)}</span><span class="bm-s">Sin mínimo</span>
           </button>
           <button role="tab" class="bm b2b ${d ? '' : 'on'}" data-tab="mayor" aria-selected="${!d}">
-            <span class="bm-l">Por mayor</span><span class="bm-p">${cop(wholesale(p, T[0].off))}</span><span class="bm-s">desde ${T[0].min} piezas · hasta ${cop(wholesale(p, T[T.length - 1].off))}</span>
+            <span class="bm-l">Por mayor</span><span class="bm-p">${cop(wholesale(p, T[0].off))}</span><span class="bm-s">mín. ${MIN_REF} de esta prenda · hasta ${cop(wholesale(p, T[T.length - 1].off))}</span>
           </button>
         </div>
         ${d ? '' : `<table class="tiers">
@@ -857,7 +872,7 @@
             ${T.map((t, i) => `<tr class="${cur && cur.id === t.id ? 'on' : ''}"><td>${t.name}</td><td>${t.min}${T[i + 1] ? ' – ' + (T[i + 1].min - 1) : ' o más'}</td><td><b>${cop(wholesale(p, t.off))}</b></td></tr>`).join('')}
           </tbody>
         </table>
-        <p class="small muted">Las ${T[0].min} piezas se cuentan en todo el pedido: puedes mezclar esta prenda con otras referencias, tallas y colores.</p>`}`;
+        <p class="small muted">Para el precio por mayor: mínimo <b>${MIN_REF} piezas de esta prenda</b> (puedes mezclar colores y tallas) y <b>${T[0].min} piezas en todo el pedido</b>.</p>`}`;
       $$('.bm', pa).forEach(b => b.addEventListener('click', () => { state.tab = b.dataset.tab; save(); renderPrice(); renderBuy(); }));
     }
 
@@ -874,7 +889,7 @@
             <span class="qty"><button id="q-dec" aria-label="Restar">−</button><output id="q-val">${qty}</output><button id="q-inc" aria-label="Sumar">+</button></span>
             <button class="btn grow" id="add">${size ? 'Agregar al pedido' : 'Elige una talla'}</button>
           </div>
-          ${state.cart.length ? tierMeter() : `<p class="small muted">¿Tienes tienda? Desde ${T[0].min} piezas en tu pedido, todo pasa a precio por mayor (${cop(wholesale(p, T[0].off))} esta prenda). <button class="link" id="to-b2b">Comprar por mayor</button></p>`}`;
+          ${state.cart.length ? tierMeter() : `<p class="small muted">¿Tienes tienda? Con ${MIN_REF} o más de esta prenda y ${T[0].min} piezas en el pedido pagas precio por mayor (${cop(wholesale(p, T[0].off))} esta prenda). <button class="link" id="to-b2b">Comprar por mayor</button></p>`}`;
         const tb = $('#to-b2b');
         if (tb) tb.addEventListener('click', () => { state.tab = 'mayor'; save(); renderPrice(); renderBuy(); });
         $$('.size', ba).forEach(b => b.addEventListener('click', () => { size = b.dataset.s; renderBuy(); }));

@@ -724,3 +724,8 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
   .quick-in { grid-column: 2 / 3; }
   .quick-row .btn { grid-column: 3; grid-row: 1 / 3; }
 }
+
+/* Avisos de la regla "mínimo 4 piezas por prenda" */
+.wp-rule { margin: 0; padding: 10px 12px; background: var(--paper-2); font-size: .86rem; }
+.wp-rule.ok { background: #EAF4EE; color: var(--ok); font-weight: 600; }
+.line-rule { margin: 2px 0 0; font-size: .78rem; color: var(--b2b); font-weight: 600; }
