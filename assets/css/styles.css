@@ -471,3 +471,7 @@ fieldset > *:not(legend) { clear: both; }
 .bm.b2b.on { border-color: var(--b2b); box-shadow: inset 0 0 0 1px var(--b2b); background: var(--b2b-soft); }
 .card-price small { font-weight: 500; font-size: .74rem; }
 .card-price .price.b2b { font-size: .95rem; }
+
+/* Rótulos del filtro de tallas (dama / caballero / pantalón) */
+.size-group { margin: 10px 0 6px; font-size: .78rem; color: var(--ink-2); font-weight: 600; }
+.size-group:first-of-type { margin-top: 0; }

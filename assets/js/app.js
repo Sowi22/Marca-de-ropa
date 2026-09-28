@@ -15,9 +15,9 @@
   };
   const state = {
     tab: store.get('tab', 'mayor'),     // pestaña de compra en la ficha: 'mayor' | 'detal'
-    cart: store.get('cart', [])         // [{id,color,size,qty}]
+    cart: store.get('cart-v2', [])         // [{id,color,size,qty}]
   };
-  const save = () => { store.set('tab', state.tab); store.set('cart', state.cart); };
+  const save = () => { store.set('tab', state.tab); store.set('cart-v2', state.cart); };
 
   /* ---------- Formato y precios ---------- */
   const cop = n => '$' + Math.round(n).toLocaleString('es-CO');
@@ -414,7 +414,7 @@
         <ul class="swatches" aria-label="Colores">${p.colors.map((c, i) => `<li><button class="sw ${i === 0 ? 'on' : ''}" data-c="${c}" style="background:${C[c].hex}" aria-label="${C[c].name}" title="${C[c].name}"></button></li>`).join('')}</ul>
         <a href="producto.html?id=${p.id}" class="card-name">${p.name}</a>
         <div class="card-price">${priceBlock(p)}</div>
-        <p class="card-meta muted small">${p.sizes[0]}–${p.sizes[p.sizes.length - 1]} · ${p.colors.length} colores</p>
+        <p class="card-meta muted small">Tallas ${p.sizes[0]}–${p.sizes[p.sizes.length - 1]} · ${p.colors.length} colores</p>
       </div>
     </article>`;
   }
@@ -513,12 +513,13 @@
     };
     if (f.q) $('#q').value = q.get('q');
 
-    const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36'];
+    // Dama en numeración colombiana, caballero en letras, pantalón de hombre por cintura.
+    const sizeGroups = [['Dama', ['6', '8', '10', '12']], ['Caballero y unisex', ['S', 'M', 'L', 'XL', 'XXL']], ['Pantalón hombre', ['28', '30', '32', '34', '36']]];
     const usedColors = Object.keys(C).filter(k => P.some(p => p.colors.includes(k)));
     $('#filters-body').innerHTML = `
       <fieldset><legend>Género</legend>${['mujer', 'hombre', 'unisex'].map(g => `<label class="chk"><input type="checkbox" name="genero" value="${g}" ${f.genero.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
       <fieldset><legend>Línea</legend>${['deportiva', 'casual'].map(g => `<label class="chk"><input type="checkbox" name="linea" value="${g}" ${f.linea.includes(g) ? 'checked' : ''}/> ${g[0].toUpperCase() + g.slice(1)}</label>`).join('')}</fieldset>
-      <fieldset><legend>Talla</legend><div class="size-grid">${allSizes.map(s => `<label class="size-chip"><input type="checkbox" name="tallas" value="${s}"/><span>${s}</span></label>`).join('')}</div></fieldset>
+      <fieldset><legend>Talla</legend>${sizeGroups.map(([g, sizes]) => `<p class="size-group">${g}</p><div class="size-grid">${sizes.map(s => `<label class="size-chip"><input type="checkbox" name="tallas" value="${s}"/><span>${s}</span></label>`).join('')}</div>`).join('')}</fieldset>
       <fieldset><legend>Color</legend><div class="color-grid">${usedColors.map(c => `<label class="color-chip" title="${C[c].name}"><input type="checkbox" name="colores" value="${c}" ${f.colores.includes(c) ? 'checked' : ''}/><i style="background:${C[c].hex}"></i><span>${C[c].name}</span></label>`).join('')}</div></fieldset>
       <fieldset><legend>Disponibilidad</legend><label class="chk"><input type="checkbox" name="stock"/> Todas las tallas disponibles</label></fieldset>`;
 
@@ -760,10 +761,20 @@
     renderPrice(); renderBuy(); renderRelated();
   }
 
+  // Medidas orientativas del cuerpo en cm: [busto/pecho, cintura, cadera]. [VALIDAR con patronaje real]
+  const SIZE_TABLE = {
+    '6': ['84–88', '64–68', '90–94'], '8': ['88–92', '68–72', '94–98'], '10': ['92–96', '72–76', '98–102'], '12': ['96–100', '76–80', '102–106'],
+    S: ['92–96', '76–80'], M: ['96–102', '80–86'], L: ['102–108', '86–92'], XL: ['108–114', '92–98'], XXL: ['114–120', '98–104']
+  };
   function sizeGuide(p) {
-    if (p.sizes[0] === '28') return `<table class="tiers"><thead><tr><th>Talla</th><th>Cintura (cm)</th></tr></thead><tbody>${p.sizes.map((s, i) => `<tr><td>${s}</td><td>${72 + i * 5}–${76 + i * 5}</td></tr>`).join('')}</tbody></table><p class="small muted">[VALIDAR con medidas reales de patronaje]</p>`;
-    const rows = { XS: '60–64', S: '64–68', M: '68–74', L: '74–80', XL: '80–86', XXL: '86–92' };
-    return `<table class="tiers"><thead><tr><th>Talla</th><th>Cintura (cm)</th></tr></thead><tbody>${p.sizes.map(s => `<tr><td>${s}</td><td>${rows[s]}</td></tr>`).join('')}</tbody></table><p class="small muted">[VALIDAR con medidas reales de patronaje]</p>`;
+    const note = '<p class="small muted">Medidas del cuerpo en centímetros. [VALIDAR con medidas reales de patronaje]</p>';
+    if (p.sizes[0] === '28') return `<table class="tiers"><thead><tr><th>Talla</th><th>Cintura (cm)</th></tr></thead><tbody>${p.sizes.map((s, i) => `<tr><td>${s}</td><td>${72 + i * 5}–${76 + i * 5}</td></tr>`).join('')}</tbody></table>${note}`;
+    const dama = p.sizes[0] === '6';
+    const intro = dama ? 'Tallaje de dama en numeración colombiana.' : p.gender === 'unisex' ? 'Tallaje unisex en letras. La dama suele pedir una talla menos.' : 'Tallaje de caballero en letras.';
+    return `<p class="small">${intro}</p>
+      <table class="tiers"><thead><tr><th>Talla</th><th>${dama ? 'Busto' : 'Pecho'}</th><th>Cintura</th>${dama ? '<th>Cadera</th>' : ''}</tr></thead><tbody>
+      ${p.sizes.map(s => { const r = SIZE_TABLE[s] || ['—', '—', '—']; return `<tr><td>${s}</td><td>${r[0]}</td><td>${r[1]}</td>${dama ? `<td>${r[2]}</td>` : ''}</tr>`; }).join('')}
+      </tbody></table>${note}`;
   }
 
   /* ---------- Página: mayoristas ---------- */
