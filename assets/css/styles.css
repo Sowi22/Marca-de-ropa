@@ -600,3 +600,25 @@ body.home:not(.menu-open) #site-header:not(.solid):not(:has(.nav-item.open)) .ic
 #site-footer .logo { color: #fff; }
 
 @media (prefers-reduced-motion: reduce) { .fl { animation: none; } }
+
+/* Niveles de precio por mayor: 4 columnas con un ejemplo real */
+.tiers-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+.ts { display: grid; gap: 6px; align-content: start; padding: 26px 22px 28px; border-left: 1px solid var(--line); }
+.ts:first-child { border-left: 0; padding-left: 0; }
+.ts p { margin: 0; }
+.ts-name { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.ts-qty { font-size: .9rem; font-weight: 600; text-transform: uppercase; }
+.ts-qty b { display: block; font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1; letter-spacing: -.02em; }
+.ts-off { font-size: 1.5rem; font-weight: 900; color: var(--b2b); }
+.ts.detal .ts-off { font-size: 1rem; font-weight: 700; color: var(--ink-2); padding-block: 6px; }
+.ts-ex { font-size: .82rem; color: var(--ink-2); padding-top: 10px; border-top: 1px solid var(--line); margin-top: 6px !important; font-variant-numeric: tabular-nums; }
+.ts-ex s { color: var(--muted); }
+.ts-ex b { color: var(--ink); font-size: .95rem; }
+.ts-extra { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.tiers-cta { margin-top: 24px; }
+@media (max-width: 800px) {
+  .tiers-strip { grid-template-columns: 1fr 1fr; }
+  .ts { padding: 20px 14px; }
+  .ts:nth-child(3) { border-left: 0; padding-left: 0; }
+  .ts:nth-child(n+3) { border-top: 1px solid var(--line); }
+}

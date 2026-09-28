@@ -507,30 +507,30 @@
     const best = $('#best');
     const renderBest = () => { if (best) { best.innerHTML = P.filter(p => p.tags.includes('bestseller')).slice(0, 8).map(card).join(''); bindCards(best); } };
     renderBest();
-    initCalc();
+    initTierStrip();
     initSeasonColors();
   }
 
-  // Calculadora de volumen: responde "¿cuánto ahorro y cuánto gano revendiendo?"
-  // Usa un precio detal promedio por pieza [SUPUESTO] para convertir piezas a pesos.
-  const AVG_RETAIL = 79900;
-  function initCalc() {
-    const r = $('#calc-range');
-    if (!r) return;
-    const out = () => {
-      const units = +r.value;
-      const retailValue = units * AVG_RETAIL;
-      const t = tierFor(units);
-      const pay = t ? retailValue * (1 - t.off) : retailValue;
-      $('#calc-units').textContent = pz(units);
-      $('#calc-retail').textContent = cop(retailValue);
-      $('#calc-tier').textContent = t ? `${t.name} · −${t.off * 100}%` : `Detal (faltan ${pz(T[0].min - units)})`;
-      $('#calc-pay').textContent = cop(pay);
-      $('#calc-margin').textContent = cop(retailValue - pay);
-      $$('#tier-rows [data-t]').forEach(row => row.classList.toggle('on', !!t && row.dataset.t === t.id));
-    };
-    r.addEventListener('input', out);
-    out();
+  // Niveles de precio en columnas, con una prenda real como ejemplo.
+  function initTierStrip() {
+    const el = $('#tiers-strip');
+    if (!el) return;
+    const ex = byId('legging-flex') || P[0];
+    const extra = ['Tu primer pedido por mayor', 'Envío gratis a toda Colombia', 'Asesor asignado y factura'];
+    el.innerHTML = `
+      <div class="ts detal">
+        <p class="ts-name">Detal</p>
+        <p class="ts-qty"><b>1–${T[0].min - 1}</b> piezas</p>
+        <p class="ts-off">Precio normal</p>
+        <p class="ts-ex">${ex.name}<br><b>${cop(ex.price)}</b></p>
+      </div>` + T.map((t, i) => `
+      <div class="ts">
+        <p class="ts-name">${t.name}</p>
+        <p class="ts-qty"><b>${t.min}+</b> piezas</p>
+        <p class="ts-off">−${t.off * 100}%</p>
+        <p class="ts-ex">${ex.name}<br><s>${cop(ex.price)}</s> <b>${cop(wholesale(ex, t.off))}</b></p>
+        <p class="ts-extra">${extra[i]}</p>
+      </div>`).join('');
   }
 
   function initSeasonColors() {

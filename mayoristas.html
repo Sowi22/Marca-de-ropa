@@ -35,25 +35,11 @@
     </section>
 
     <section class="wrap section" id="niveles">
-      <div class="section-h"><h2>Niveles de precio</h2></div>
-      <div class="calc">
-        <div class="calc-in">
-          <label for="calc-range"><b>Piezas en tu pedido: <span id="calc-units"></span></b></label>
-          <input id="calc-range" type="range" min="1" max="120" step="1" value="36" />
-          <div class="tier-rows" id="tier-rows">
-            <div data-t="may1"><span>Por mayor</span><span>12 a 35 piezas · −35%</span></div>
-            <div data-t="may2"><span>Mayor Plus</span><span>36 a 71 piezas · −40% · envío gratis</span></div>
-            <div data-t="dist"><span>Distribuidor</span><span>72 piezas o más · −45% · asesor asignado</span></div>
-          </div>
-        </div>
-        <div class="calc-out">
-          <dl>
-            <div><dt>Vendes a detal sugerido</dt><dd id="calc-retail">—</dd></div>
-            <div><dt>Tu nivel</dt><dd id="calc-tier" style="font-size:1.2rem">—</dd></div>
-            <div><dt>Pagas</dt><dd id="calc-pay">—</dd></div>
-            <div><dt>Margen bruto estimado</dt><dd id="calc-margin" class="hl">—</dd></div>
-          </dl>
-        </div>
+      <div class="section-h"><div><h2>Precio según piezas</h2><p class="muted">Las piezas se cuentan en todo el pedido: mezcla referencias, tallas y colores.</p></div></div>
+      <div class="tiers-strip" id="tiers-strip"></div>
+      <div class="row tiers-cta">
+        <a class="btn btn-b2b" href="catalogo.html?vista=lista">Armar pedido por mayor</a>
+        <a class="btn ghost" href="mayoristas.html#asesor">Hablar con un asesor</a>
       </div>
     </section>
 
